@@ -49,7 +49,7 @@ public class UserDAO implements UserInterface {
         if (rs.next()) {
             User u = new User();
             u.setId(rs.getInt("id"));
-            u.setName(rs.getString("name"));
+            u.setName(rs.getString("name")); // <-- FIXED: Changed from "fullName" to "name"
             u.setGender(rs.getString("gender"));
             u.setEmail(rs.getString("email"));
             u.setPassword(rs.getString("password"));

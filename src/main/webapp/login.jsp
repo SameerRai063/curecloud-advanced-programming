@@ -80,89 +80,24 @@
                         "sm": "12px"
                     },
                     "fontFamily": {
-                        "headline-lg": [
-                            "Manrope"
-                        ],
-                        "body-lg": [
-                            "Inter"
-                        ],
-                        "body-sm": [
-                            "Inter"
-                        ],
-                        "headline-sm": [
-                            "Manrope"
-                        ],
-                        "button": [
-                            "Inter"
-                        ],
-                        "label-md": [
-                            "Public Sans"
-                        ],
-                        "headline-md": [
-                            "Manrope"
-                        ],
-                        "body-md": [
-                            "Inter"
-                        ]
+                        "headline-lg": ["Manrope"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-sm": ["Manrope"],
+                        "button": ["Inter"],
+                        "label-md": ["Public Sans"],
+                        "headline-md": ["Manrope"],
+                        "body-md": ["Inter"]
                     },
                     "fontSize": {
-                        "headline-lg": [
-                            "32px",
-                            {
-                                "lineHeight": "40px",
-                                "fontWeight": "700"
-                            }
-                        ],
-                        "body-lg": [
-                            "18px",
-                            {
-                                "lineHeight": "28px",
-                                "fontWeight": "400"
-                            }
-                        ],
-                        "body-sm": [
-                            "14px",
-                            {
-                                "lineHeight": "20px",
-                                "fontWeight": "400"
-                            }
-                        ],
-                        "headline-sm": [
-                            "20px",
-                            {
-                                "lineHeight": "28px",
-                                "fontWeight": "600"
-                            }
-                        ],
-                        "button": [
-                            "16px",
-                            {
-                                "lineHeight": "24px",
-                                "fontWeight": "500"
-                            }
-                        ],
-                        "label-md": [
-                            "12px",
-                            {
-                                "lineHeight": "16px",
-                                "letterSpacing": "0.02em",
-                                "fontWeight": "600"
-                            }
-                        ],
-                        "headline-md": [
-                            "24px",
-                            {
-                                "lineHeight": "32px",
-                                "fontWeight": "600"
-                            }
-                        ],
-                        "body-md": [
-                            "16px",
-                            {
-                                "lineHeight": "24px",
-                                "fontWeight": "400"
-                            }
-                        ]
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "button": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
                     }
                 },
             },
@@ -171,12 +106,13 @@
 </head>
 <body class="bg-background min-h-screen flex items-center justify-center font-body-md text-body-md text-on-surface">
 <div class="w-full max-w-7xl mx-auto min-h-screen flex flex-col md:flex-row bg-background relative overflow-hidden shadow-[0_8px_30px_rgba(47,65,86,0.05)] border-4 border-white rounded-xl">
-    <div class="hidden md:block md:w-1/2 relative bg-surface-variant"><div class="absolute top-gutter left-gutter z-20">
-        <div class="border border-white/80 rounded-[4px] px-md py-sm bg-transparent backdrop-blur-sm">
-            <span class="font-headline-sm text-white tracking-widest font-bold">UPACHAR</span>
+    <div class="hidden md:block md:w-1/2 relative bg-surface-variant">
+        <div class="absolute top-gutter left-gutter z-20">
+            <div class="border border-white/80 rounded-[4px] px-md py-sm bg-transparent backdrop-blur-sm">
+                <span class="font-headline-sm text-white tracking-widest font-bold">UPACHAR</span>
+            </div>
         </div>
-    </div>
-        <img alt="A high-quality 3D minimalist illustration of a friendly doctor advising a patient." class="absolute inset-0 w-full h-full object-cover" data-alt="A high-quality 3D minimalist illustration of a friendly doctor advising a patient. Smooth, matte 3D clay render, modern corporate UI web illustration style. Characters are stylized, modern, faceless or with minimal features. Doctor wearing a white coat, sitting across from a patient in a comfortable, abstract clinical setting. Soft studio lighting, smooth gradient shadows. Solid soft sky-blue background with plenty of negative space at the top and left. Clean healthcare aesthetic, 8k, Blender 3D style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDDeFkvl4CxBUr3zaFSzFsT0cQ5F4zKop32QPPR8Z5Ly4-S2JJMeICQRblzN0R2bVfb6VQP3dkswA5EYb-20wq2eO692EREzOYPDQKRRoXbveMgWv3NeaNRzq4WwkRqTYYNE-DJi16BSQIe94MhQJyks1jcPPEbKUdzLbh0tSZeu2Jc2sG4GBK-eKMoS0WkVnHPoQY9e7RMP45bNpOE7Tcxp1mwfh3dThQmOPYx6EUN3lgwYSE90-2vf2ariFt2KzxvT8H9h2o83cU"/>
+        <img alt="A high-quality 3D minimalist illustration of a friendly doctor advising a patient." class="absolute inset-0 w-full h-full object-cover" data-alt="A high-quality 3D minimalist illustration of a friendly doctor advising a patient." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDDeFkvl4CxBUr3zaFSzFsT0cQ5F4zKop32QPPR8Z5Ly4-S2JJMeICQRblzN0R2bVfb6VQP3dkswA5EYb-20wq2eO692EREzOYPDQKRRoXbveMgWv3NeaNRzq4WwkRqTYYNE-DJi16BSQIe94MhQJyks1jcPPEbKUdzLbh0tSZeu2Jc2sG4GBK-eKMoS0WkVnHPoQY9e7RMP45bNpOE7Tcxp1mwfh3dThQmOPYx6EUN3lgwYSE90-2vf2ariFt2KzxvT8H9h2o83cU"/>
         <div class="absolute inset-0 bg-primary/10"></div>
     </div>
     <div class="w-full md:w-1/2 flex flex-col bg-surface-container-lowest rounded-tl-[3rem] md:-ml-8 z-10 p-gutter md:p-xl relative min-h-screen justify-between shadow-[0_8px_30px_rgba(47,65,86,0.08)] rounded-bl-[3rem]">
@@ -186,13 +122,24 @@
                 <p class="font-body-lg text-body-lg text-on-surface-variant">Please enter your details to access your account.</p>
             </div>
 
-            <%-- Form updated with action, method, and conditional error message display --%>
             <form action="${pageContext.request.contextPath}/login" method="POST" class="space-y-md">
 
-                <%-- JSTL conditional to display error messages safely --%>
-                <c:if test="${not empty requestScope.errorMessage}">
+                <%-- Catch successful registration --%>
+                <c:if test="${param.success == 'registered'}">
+                    <div class="text-primary font-body-sm bg-secondary-container p-sm rounded-lg">
+                        Account created successfully! Please log in.
+                    </div>
+                </c:if>
+
+                <%-- Catch login errors --%>
+                <c:if test="${param.error == 'invalid_credentials'}">
                     <div class="text-error font-body-sm bg-error-container p-sm rounded-lg">
-                            ${requestScope.errorMessage}
+                        Invalid email or password. Please try again.
+                    </div>
+                </c:if>
+                <c:if test="${param.error == 'system_error'}">
+                    <div class="text-error font-body-sm bg-error-container p-sm rounded-lg">
+                        A system error occurred. Please try again later.
                     </div>
                 </c:if>
 
@@ -200,7 +147,6 @@
                     <label class="font-label-md text-label-md text-on-surface-variant block" for="email">Email Address</label>
                     <div class="relative">
                         <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant">mail</span>
-                        <%-- Added name="email" and value="${param.email}" --%>
                         <input class="w-full pl-lg pr-sm py-sm bg-surface-container-lowest border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md text-body-md text-on-surface placeholder:text-outline-variant" id="email" name="email" value="${param.email}" placeholder="Enter your email" type="email" required/>
                     </div>
                 </div>
@@ -208,7 +154,6 @@
                     <label class="font-label-md text-label-md text-on-surface-variant block" for="password">Password</label>
                     <div class="relative">
                         <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant">lock</span>
-                        <%-- Added name="password" --%>
                         <input class="w-full pl-lg pr-sm py-sm bg-surface-container-lowest border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md text-body-md text-on-surface placeholder:text-outline-variant" id="password" name="password" placeholder="••••••••" type="password" required/>
                     </div>
                 </div>
@@ -220,16 +165,16 @@
                         Sign In
                         <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
                     </button>
-                </div><div class="mt-md text-center">
-                <p class="font-body-md text-body-md text-on-surface-variant">
-                    Don't have an account?
-                    <a class="font-label-md text-label-md text-secondary hover:text-primary-container transition-colors ml-xs" href="register.jsp">Sign Up</a>
-                </p>
-            </div>
+                </div>
+                <div class="mt-md text-center">
+                    <p class="font-body-md text-body-md text-on-surface-variant">
+                        Don't have an account?
+                        <a class="font-label-md text-label-md text-secondary hover:text-primary-container transition-colors ml-xs" href="register.jsp">Sign Up</a>
+                    </p>
+                </div>
             </form>
         </div>
         <div class="mt-lg text-center">
-            <%-- Replaced hardcoded '2024' with dynamic Java year processing --%>
             <p class="font-body-sm text-body-sm text-outline">© <%= java.time.Year.now().getValue() %> Upachar Hospital Management. All rights reserved.</p>
         </div>
     </div>

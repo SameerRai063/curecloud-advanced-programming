@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%
     // Mocking backend data for dynamic JSP rendering
     request.setAttribute("hospitalName", "Upachar");

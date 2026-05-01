@@ -118,12 +118,9 @@
     }
   </style>
 </head>
-<%-- Removed padding from body to allow full-bleed layout matching the login page --%>
 <body class="bg-background min-h-screen flex items-center justify-center font-body-md text-on-background">
 
-<%-- Updated main container classes to match the login page's full screen flex behavior --%>
 <main class="w-full max-w-7xl mx-auto min-h-screen flex flex-col md:flex-row bg-background relative overflow-hidden shadow-[0_8px_30px_rgba(47,65,86,0.05)] border-4 border-white rounded-xl">
-  <%-- Adjusted to md:w-1/2 and hidden on mobile to mirror login exactly --%>
   <div class="hidden md:block md:w-1/2 relative bg-secondary-fixed/50 overflow-hidden">
     <div class="absolute top-gutter left-gutter z-20">
       <div class="px-sm py-xs border-2 border-surface-container-lowest rounded-md bg-transparent text-surface-container-lowest font-headline-sm tracking-widest uppercase shadow-sm">
@@ -133,7 +130,7 @@
     <img alt="Illustration" class="absolute inset-0 w-full h-full object-cover object-center mix-blend-multiply opacity-90" data-alt="A high-quality 3D minimalist matte clay render style illustration of a doctor and patient interacting in a serene, modern clinical setting. The background is a soft, calming sky blue. The characters are stylized with soft edges and a smooth, untextured finish, embodying a sophisticated, highly accessible, and deeply professional hospital management environment. Lighting is diffused and soft, creating gentle ambient shadows that suggest a clean, trustworthy atmosphere." src="https://lh3.googleusercontent.com/aida/ADBb0uinVHRWTl-slXDdcxYJ-HTsgYe2dq1RpuRWoyyu77JoWgFPSeHOvLX4xQIffSYenRTcDXwqvlOg0ioN0VOxdqNGSn86rRicOEylCMBMsUfh1VR9BxyskjdR5xBRBQZir-TqR7c5nwWO1S2g8Aurml0p9ll2_XiWRfZiEJGEjbC-MSlheNGIDytH9KhkKg1P_A_mLa4aZTUmMHSYlf6yjtj9eJGTlnHh3-jsmXzLo6c4N8wBD4D5RIJJt22U"/>
     <div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
   </div>
-  <%-- Adopted the exact spacing, radii, and min-h-screen flex behavior from the login page --%>
+
   <div class="w-full md:w-1/2 flex flex-col bg-surface-container-lowest rounded-tl-[3rem] md:-ml-8 z-10 p-gutter md:p-xl relative min-h-screen justify-between shadow-[0_8px_30px_rgba(47,65,86,0.08)] rounded-bl-[3rem]">
     <div class="flex-grow flex flex-col justify-center max-w-md mx-auto w-full">
       <div class="mb-lg">
@@ -141,8 +138,8 @@
         <p class="font-body-md text-on-surface-variant">Join Upachar to manage your healthcare journey.</p>
       </div>
 
-      <%-- JSP Form bindings --%>
-      <form action="${pageContext.request.contextPath}/register" method="POST" class="space-y-md">
+      <%-- JSP Form bindings with updated action --%>
+      <form action="${pageContext.request.contextPath}/register-patient" method="POST" class="space-y-md">
 
         <%-- Alert Messages --%>
         <c:if test="${not empty requestScope.errorMessage}">
@@ -156,19 +153,6 @@
           </div>
         </c:if>
 
-        <div class="bg-surface-container-low p-1 rounded-xl flex gap-1 mb-md">
-          <%-- Hidden input to capture the role for submission --%>
-          <input type="hidden" name="role" id="roleInput" value="Patient">
-          <button class="flex-1 py-2 px-4 rounded-lg bg-surface-container-lowest shadow-sm text-primary font-label-md text-center transition-all" type="button" onclick="document.getElementById('roleInput').value='Patient'">
-            Patient
-          </button>
-          <button class="flex-1 py-2 px-4 rounded-lg text-on-surface-variant hover:text-primary font-label-md text-center transition-all" type="button" onclick="document.getElementById('roleInput').value='Doctor'">
-            Doctor
-          </button>
-          <button class="flex-1 py-2 px-4 rounded-lg text-on-surface-variant hover:text-primary font-label-md text-center transition-all" type="button" onclick="document.getElementById('roleInput').value='Receptionist'">
-            Receptionist
-          </button>
-        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="fullName">Full Name</label>
@@ -185,6 +169,7 @@
             </div>
           </div>
         </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="email">Email Address</label>
@@ -201,6 +186,7 @@
             </div>
           </div>
         </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="bloodGroup">Blood Group</label>
@@ -234,6 +220,7 @@
             </div>
           </div>
         </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="password">Password</label>
@@ -253,6 +240,7 @@
             </div>
           </div>
         </div>
+
         <div class="pt-sm">
           <button class="w-full bg-primary-container text-on-primary font-button py-4 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-ambient" type="submit">
             Sign Up
@@ -260,6 +248,7 @@
           </button>
         </div>
       </form>
+
       <div class="mt-lg text-center">
         <p class="font-body-sm text-on-surface-variant">
           Already have an account?
@@ -269,4 +258,5 @@
     </div>
   </div>
 </main>
-</body></html>
+</body>
+</html>

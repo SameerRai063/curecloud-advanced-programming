@@ -25,7 +25,7 @@ public class AddPatientServlet extends HttpServlet {
 
         try {
             // ===== GET FORM DATA =====
-            String name = request.getParameter("name");
+            String name = request.getParameter("fullName");
             String gender = request.getParameter("gender");
             String email = request.getParameter("email");
             String password = request.getParameter("password");
