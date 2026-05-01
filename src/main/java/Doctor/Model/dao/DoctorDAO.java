@@ -84,4 +84,15 @@ public class DoctorDAO implements DoctorInterface {
         ps.setInt(1, userId);
         return ps.executeUpdate() > 0;
     }
+    @Override
+    public boolean updateDoctor(Doctor doctor) throws Exception {
+        String sql = "UPDATE doctor SET status=?, qualifications=?, department=?, experience_years=? WHERE user_id=?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, doctor.getStatus());
+        ps.setString(2, doctor.getQualifications());
+        ps.setString(3, doctor.getDepartment());
+        ps.setInt(4, doctor.getExperienceYears());
+        ps.setInt(5, doctor.getUserId());
+        return ps.executeUpdate() > 0;
+    }
 }

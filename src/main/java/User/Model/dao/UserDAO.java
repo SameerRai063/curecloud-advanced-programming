@@ -69,4 +69,15 @@ public class UserDAO implements UserInterface {
 
         return ps.executeUpdate() > 0;
     }
+    public boolean updateUser(User user) throws Exception {
+        String sql = "UPDATE users SET name=?, gender=?, address=?, phone=?, updatedAt=CURRENT_TIMESTAMP WHERE id=?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, user.getName());
+        ps.setString(2, user.getGender());
+        ps.setString(3, user.getAddress());
+        ps.setString(4, user.getPhone());
+        ps.setInt(5, user.getId());
+
+        return ps.executeUpdate() > 0;
+    }
 }

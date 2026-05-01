@@ -78,4 +78,12 @@ public class ReceptionistDAO implements ReceptionistInterface {
         ps.setInt(1, userId);
         return ps.executeUpdate() > 0;
     }
+    @Override
+    public boolean updateReceptionist(Receptionist receptionist) throws Exception {
+        String sql = "UPDATE receptionist SET status=? WHERE user_id=?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, receptionist.getStatus());
+        ps.setInt(2, receptionist.getUserId());
+        return ps.executeUpdate() > 0;
+    }
 }
