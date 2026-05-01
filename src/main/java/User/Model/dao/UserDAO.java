@@ -59,4 +59,14 @@ public class UserDAO implements UserInterface {
 
         return null;
     }
+    @Override
+    public boolean deleteUser(int userId) throws Exception {
+
+        String sql = "DELETE FROM users WHERE id=?";
+
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, userId);
+
+        return ps.executeUpdate() > 0;
+    }
 }
