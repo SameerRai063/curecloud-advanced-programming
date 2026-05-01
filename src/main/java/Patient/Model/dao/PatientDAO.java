@@ -84,4 +84,13 @@ public class PatientDAO implements PatientInterface {
         ps.setInt(1, userId);
         return ps.executeUpdate() > 0;
     }
+    @Override
+    public boolean updatePatient(Patient patient) throws Exception {
+        String sql = "UPDATE patient SET blood_group=?, is_active=? WHERE user_id=?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, patient.getBloodGroup());
+        ps.setString(2, patient.isActive() ? "yes" : "no");
+        ps.setInt(3, patient.getUserId());
+        return ps.executeUpdate() > 0;
+    }
 }

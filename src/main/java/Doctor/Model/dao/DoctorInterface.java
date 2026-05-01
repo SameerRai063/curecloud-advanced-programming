@@ -7,6 +7,7 @@ public interface DoctorInterface {
 
     boolean addDoctor(Doctor doctor) throws Exception;
     boolean deleteDoctor(int userId) throws Exception;
+    boolean updateDoctor(Doctor doctor) throws Exception;
     // Retrieves a list of all doctors with their user details attached
     List<Doctor> getAllDoctors() throws Exception;
 }
