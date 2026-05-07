@@ -2,6 +2,7 @@ package com.hospital.hospitalmanagementsystem.rating.controller;
 
 import com.hospital.hospitalmanagementsystem.rating.model.Rating;
 import com.hospital.hospitalmanagementsystem.rating.service.RatingService;
+import com.hospital.hospitalmanagementsystem.rating.util.AuthUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -22,20 +23,47 @@ public class ViewRatingServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String idParam = request.getParameter("id");
-
 		try {
-			if (idParam != null && !idParam.isBlank()) {
-				Rating rating = ratingService.getRatingById(Integer.parseInt(idParam));
-				request.setAttribute("rating", rating);
-			} else {
-				List<Rating> ratings = ratingService.getAllRatings();
-				request.setAttribute("ratings", ratings);
+			// CHECK: User must be logged in
+			if (!AuthUtil.isLoggedIn(request)) {
+				response.sendRedirect(request.getContextPath() + "/rating/rating-success.jsp?message=Please%20login%20first");
+				return;
 			}
 
-			request.getRequestDispatcher("/rating/view-rating.jsp").forward(request, response);
+			Integer userId = AuthUtil.getUserId(request);
+			List<Rating> ratings;
+
+			if (AuthUtil.isAdmin(request)) {
+				// ADMIN: View all ratings
+				ratings = ratingService.getAllRatings();
+			} else if (AuthUtil.isDoctor(request)) {
+				// DOCTOR: View ratings for themselves (as doctor_id)
+				if (userId == null) {
+					response.sendRedirect(request.getContextPath() + "/rating/rating-success.jsp?message=Please%20login%20again");
+					return;
+				}
+				ratings = ratingService.getDoctorRatings(userId);
+			} else if (AuthUtil.isPatient(request)) {
+				// PATIENT: View only their own ratings (as patient_id)
+				if (userId == null) {
+					response.sendRedirect(request.getContextPath() + "/rating/rating-success.jsp?message=Please%20login%20again");
+					return;
+				}
+				ratings = ratingService.getPatientRatings(userId);
+			} else {
+				response.sendRedirect(request.getContextPath() + "/rating/rating-success.jsp?message=Invalid%20role");
+				return;
+			}
+
+			request.setAttribute("ratings", ratings);
+			if (AuthUtil.isAdmin(request)) {
+				request.getRequestDispatcher("/rating/view-ratings.jsp").forward(request, response);
+			} else {
+				request.getRequestDispatcher("/rating/patient-ratings.jsp").forward(request, response);
+			}
 		} catch (Exception e) {
-			response.sendRedirect(request.getContextPath() + "/rating/rating-success.jsp?message=Invalid%20input");
+			e.printStackTrace();
+			response.sendRedirect(request.getContextPath() + "/rating/rating-success.jsp?message=Server%20error");
 		}
 	}
 }

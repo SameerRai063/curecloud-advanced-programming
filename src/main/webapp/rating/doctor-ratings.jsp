@@ -1,149 +1,94 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="java.util.*" %>
+<%@ page import="com.hospital.hospitalmanagementsystem.rating.model.Rating" %>
+<%@ page import="com.hospital.hospitalmanagementsystem.rating.util.AuthUtil" %>
+<%
+    if (!AuthUtil.isLoggedIn(request)) {
+        response.sendRedirect(request.getContextPath() + "/LoginServlet");
+        return;
+    }
+    if (!AuthUtil.isDoctor(request)) {
+        response.sendRedirect(request.getContextPath() + "/rating/rating-success.jsp?message=Access%20Denied");
+        return;
+    }
+
+    @SuppressWarnings("unchecked")
+    List<Rating> ratings = (List<Rating>) request.getAttribute("ratings");
+    if (ratings == null) ratings = Collections.emptyList();
+
+      String doctorName = (String) request.getAttribute("doctorName");
+      String doctorPhoto = (String) request.getAttribute("doctorPhoto");
+      if ((doctorPhoto == null || doctorPhoto.isBlank()) && !ratings.isEmpty()) {
+        Rating firstRating = ratings.isEmpty() ? null : ratings.get(0);
+        doctorPhoto = firstRating == null ? null : firstRating.getDoctorPhoto();
+    }
+%>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Doctor Ratings — Upachar</title>
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css">
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Doctor Ratings - Upachar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/rating/rating.css">
 </head>
 <body>
-<div class="site">
-	<div class="page-shell">
-		<header class="topbar">
-			<div class="topbar-inner container">
-				<a class="brand" href="${pageContext.request.contextPath}/">
-					<span class="brand-mark"></span>
-					<span>Doctor Ratings<small>Search by doctor ID</small></span>
-				</a>
-				<nav class="top-links">
-					<a href="${pageContext.request.contextPath}/">Home</a>
-					<a href="${pageContext.request.contextPath}/rating/add-rating.jsp">Add Rating</a>
-					<a href="${pageContext.request.contextPath}/ViewRatingServlet">View Ratings</a>
-					<a class="active" href="${pageContext.request.contextPath}/DoctorRatingServlet">Doctor Search</a>
-				</nav>
-			</div>
-		</header>
+<div class="page">
+    <div class="topbar">
+        <h1>Upachar • Doctor Ratings</h1>
+        <div class="sub">Feedback received from patients</div>
+    </div>
 
-		<main class="container">
-			<section class="hero-banner">
-				<div class="hero-card">
-					<div class="hero-copy">
-						<span class="eyebrow">Doctor-focused insights</span>
-						<h1>Find every rating linked to a specific doctor.</h1>
-						<p>Use the doctor ID to filter feedback instantly and review the patient experience in a structured format.</p>
-					</div>
-					<aside class="hero-aside">
-						<div>
-							<h3 class="aside-title">Search benefits</h3>
-							<p style="margin:0;color:rgba(255,255,255,.82);line-height:1.7;">Ideal for reviewing service quality, follow-up performance, and patient response by doctor.</p>
-						</div>
-						<div class="aside-list">
-							<div class="aside-item"><span>Filter</span><strong>Doctor ID</strong></div>
-							<div class="aside-item"><span>View</span><strong>All linked ratings</strong></div>
-							<div class="aside-item"><span>Use case</span><strong>Quality review</strong></div>
-						</div>
-					</aside>
-				</div>
-			</section>
+    <div class="card">
+        <div class="doctor-meta" style="margin-bottom:14px">
+            <img class="avatar avatar-lg" src="<%= doctorPhoto == null ? "" : doctorPhoto %>" alt="Doctor photo">
+            <div>
+                <h2 style="margin:0 0 6px"><%= doctorName == null ? "Doctor" : doctorName %></h2>
+                <div class="muted">Ratings received: <b><%= ratings.size() %></b></div>
+            </div>
+        </div>
 
-			<section class="section">
-				<div class="form-layout">
-					<section class="panel">
-						<div class="panel-header">
-							<div>
-								<h2>Search by Doctor ID</h2>
-								<p>Enter a doctor identifier to load all relevant feedback.</p>
-							</div>
-						</div>
+        <div style="overflow:auto">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Appointment Date</th>
+                    <th>Rating</th>
+                    <th>Review</th>
+                    <th>Submitted</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% if (ratings.isEmpty()) { %>
+                <tr><td colspan="5" class="muted">No ratings found.</td></tr>
+                <% } %>
+                <% for (Rating r : ratings) { %>
+                    <tr>
+                        <td>
+                            <b><%= r.getPatientName() == null ? ("Patient #" + r.getPatientId()) : r.getPatientName() %></b>
+                            <div class="muted">Patient ID: <%= r.getPatientId() %></div>
+                        </td>
+                        <td><%= r.getAppointmentDate() == null ? "-" : r.getAppointmentDate() %></td>
+                        <td>
+                            <span class="stars-read">
+                                <% for(int i=1;i<=5;i++){ %>
+                                    <% if (i <= r.getScore()) { %><span class="on">★</span><% } else { %><span class="off">★</span><% } %>
+                                <% } %>
+                            </span>
+                            <div class="muted"><%= r.getScore() %>/5</div>
+                        </td>
+                        <td><%= (r.getReview() == null || r.getReview().isBlank()) ? "<span class='muted'>—</span>" : r.getReview() %></td>
+                        <td><%= r.getCreatedAt() == null ? "-" : r.getCreatedAt() %></td>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
 
-						<form action="${pageContext.request.contextPath}/DoctorRatingServlet" method="get" class="form-stack">
-							<div>
-								<label for="doctorId">Doctor ID</label>
-								<input id="doctorId" type="number" min="1" name="doctorId" value="${doctorId}" placeholder="Enter doctor ID">
-							</div>
-							<div class="actions">
-								<button type="submit" class="btn">Search</button>
-								<a class="btn secondary" href="${pageContext.request.contextPath}/ViewRatingServlet">Show All Ratings</a>
-							</div>
-						</form>
-					</section>
-
-					<aside class="sidebar-card">
-						<h3 style="margin-top:0;">Helpful pointers</h3>
-						<div class="summary-list">
-							<div class="summary-line"><span>Numeric doctor ID</span><strong>Required</strong></div>
-							<div class="summary-line"><span>Results scope</span><strong>Only matching records</strong></div>
-							<div class="summary-line"><span>Fallback option</span><strong>All ratings view</strong></div>
-						</div>
-					</aside>
-				</div>
-			</section>
-
-			<c:if test="${not empty doctorId}">
-				<section class="section">
-					<div class="panel badge">Showing results for Doctor ID ${doctorId}</div>
-				</section>
-			</c:if>
-
-			<c:choose>
-				<c:when test="${not empty doctorRatings}">
-					<section class="section">
-						<div class="panel-header">
-							<div>
-								<h2>Matched Ratings</h2>
-								<p>All feedback records linked to the selected doctor.</p>
-							</div>
-						</div>
-
-						<div class="table-card">
-							<table>
-								<thead>
-									<tr>
-										<th>ID</th>
-										<th>Patient</th>
-										<th>Appointment</th>
-										<th>Score</th>
-										<th>Review</th>
-										<th>Created</th>
-									</tr>
-								</thead>
-								<tbody>
-									<c:forEach var="rating" items="${doctorRatings}">
-										<tr>
-											<td>${rating.id}</td>
-											<td>${rating.patientId}</td>
-											<td>${rating.appointmentId}</td>
-											<td>${rating.score}</td>
-											<td>${rating.review}</td>
-											<td>${rating.createdAt}</td>
-										</tr>
-									</c:forEach>
-								</tbody>
-							</table>
-						</div>
-					</section>
-				</c:when>
-				<c:otherwise>
-					<section class="section">
-						<div class="panel empty">No ratings found. Enter a doctor ID and search to see results here.</div>
-					</section>
-				</c:otherwise>
-			</c:choose>
-		</main>
-
-		<footer class="footer container">
-			<div class="link-row">
-				<a href="${pageContext.request.contextPath}/">Home</a>
-				<a href="${pageContext.request.contextPath}/rating/add-rating.jsp">Add Rating</a>
-				<a href="${pageContext.request.contextPath}/ViewRatingServlet">All Ratings</a>
-			</div>
-		</footer>
-	</div>
+        <div class="actions">
+            <a class="btn" href="<%=request.getContextPath()%>/DoctorRatingServlet">Refresh</a>
+        </div>
+    </div>
 </div>
-
 </body>
 </html>
 

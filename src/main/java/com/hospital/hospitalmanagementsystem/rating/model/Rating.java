@@ -10,6 +10,11 @@ public class Rating {
 	private int score;
 	private String review;
 	private Timestamp createdAt;
+	// Display-only fields for JSP screens (filled via JOIN queries)
+	private String doctorName;
+	private String doctorPhoto;
+	private String patientName;
+	private String appointmentDate;
 
 	public Rating() {
 	}
@@ -68,6 +73,38 @@ public class Rating {
 
 	public void setCreatedAt(Timestamp createdAt) {
 		this.createdAt = createdAt;
+	}
+
+	public String getDoctorName() {
+		return doctorName;
+	}
+
+	public void setDoctorName(String doctorName) {
+		this.doctorName = doctorName;
+	}
+
+	public String getDoctorPhoto() {
+		return doctorPhoto;
+	}
+
+	public void setDoctorPhoto(String doctorPhoto) {
+		this.doctorPhoto = doctorPhoto;
+	}
+
+	public String getPatientName() {
+		return patientName;
+	}
+
+	public void setPatientName(String patientName) {
+		this.patientName = patientName;
+	}
+
+	public String getAppointmentDate() {
+		return appointmentDate;
+	}
+
+	public void setAppointmentDate(String appointmentDate) {
+		this.appointmentDate = appointmentDate;
 	}
 }
 
