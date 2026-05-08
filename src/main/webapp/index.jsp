@@ -2,7 +2,8 @@
 <%@ page import="com.hospital.hospitalmanagementsystem.rating.util.AuthUtil" %>
 <%
     if (!AuthUtil.isLoggedIn(request)) {
-        response.sendRedirect(request.getContextPath() + "/LoginServlet");
+        // Redirect to the interactive login page (LoginServlet expects POST; use the JSP login form)
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
 

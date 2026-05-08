@@ -39,19 +39,19 @@ public class AutoLoginServlet extends HttpServlet {
         if ("admin".equalsIgnoreCase(user)) {
             session.setAttribute("userId", 1);
             session.setAttribute("username", "admin");
-            session.setAttribute("role", "admin");
+            session.setAttribute("role", "ADMIN");
             session.setAttribute("firstName", "System");
             session.setAttribute("lastName", "Administrator");
         } else if ("patient1".equalsIgnoreCase(user)) {
             session.setAttribute("userId", 2);
             session.setAttribute("username", "patient1");
-            session.setAttribute("role", "patient");
+            session.setAttribute("role", "PATIENT");
             session.setAttribute("firstName", "John");
             session.setAttribute("lastName", "Doe");
         } else if ("doctor1".equalsIgnoreCase(user)) {
             session.setAttribute("userId", 3);
             session.setAttribute("username", "doctor1");
-            session.setAttribute("role", "doctor");
+            session.setAttribute("role", "DOCTOR");
             session.setAttribute("firstName", "Alice");
             session.setAttribute("lastName", "Smith");
         } else {

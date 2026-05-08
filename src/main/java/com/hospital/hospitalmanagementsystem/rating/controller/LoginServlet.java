@@ -49,6 +49,7 @@ public class LoginServlet extends HttpServlet {
                     if (rs.next()) {
                         int userId = rs.getInt("id");
                         String role = rs.getString("role");
+                        if (role != null) role = role.toUpperCase();
                         String firstName = rs.getString("first_name");
                         String lastName = rs.getString("last_name");
 
