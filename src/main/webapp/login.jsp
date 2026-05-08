@@ -142,6 +142,12 @@
                         A system error occurred. Please try again later.
                     </div>
                 </c:if>
+                <%-- Show the exception reason for local debugging (optional) --%>
+                <c:if test="${not empty param.reason}">
+                    <div class="text-error font-body-sm bg-error-container p-sm rounded-lg">
+                        <strong>Debug:</strong> ${param.reason}
+                    </div>
+                </c:if>
 
                 <div class="space-y-xs">
                     <label class="font-label-md text-label-md text-on-surface-variant block" for="email">Email Address</label>

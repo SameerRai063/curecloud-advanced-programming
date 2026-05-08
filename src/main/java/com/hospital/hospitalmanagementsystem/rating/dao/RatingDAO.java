@@ -1,7 +1,7 @@
 package com.hospital.hospitalmanagementsystem.rating.dao;
 
 import com.hospital.hospitalmanagementsystem.rating.model.Rating;
-import com.hospital.hospitalmanagementsystem.rating.util.DBConnection;
+import utils.DBConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,12 +15,6 @@ import java.util.List;
 
 public class RatingDAO {
 
-	/**
-	 * Business checks (appointment must be completed, no duplicate).
-	 * NOTE: table/column names here assume common HMS schema:
-	 * - appointments(id, patient_id, doctor_id, appointment_date, status)
-	 * - users(id, first_name, last_name)
-	 */
 	public boolean isAppointmentCompletedForPatient(int patientId, int appointmentId) {
 		String sql = "SELECT 1 FROM appointments WHERE id = ? AND patient_id = ? AND status = 'COMPLETED' LIMIT 1";
 		try (Connection conn = DBConnection.getConnection();
@@ -62,7 +56,7 @@ public class RatingDAO {
 			}
 		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
-			return true; // safest default
+			return true;
 		}
 	}
 
@@ -110,9 +104,9 @@ public class RatingDAO {
 	public Rating getRatingByIdDetailed(int id) {
 		String sql = """
 				SELECT r.id, r.patient_id, r.doctor_id, r.appointment_id, r.score, r.review, r.created_at,
-				       CONCAT(du.first_name, ' ', du.last_name) AS doctor_name,
-				       CONCAT(pu.first_name, ' ', pu.last_name) AS patient_name,
-				       a.appointment_date AS appointment_date
+					   CONCAT(du.first_name, ' ', du.last_name) AS doctor_name,
+					   CONCAT(pu.first_name, ' ', pu.last_name) AS patient_name,
+					   a.appointment_date AS appointment_date
 				FROM ratings r
 				LEFT JOIN appointments a ON a.id = r.appointment_id
 				LEFT JOIN users du ON du.id = r.doctor_id
@@ -137,9 +131,9 @@ public class RatingDAO {
 		List<Rating> ratings = new ArrayList<>();
 		String sql = """
 				SELECT r.id, r.patient_id, r.doctor_id, r.appointment_id, r.score, r.review, r.created_at,
-				       CONCAT(du.first_name, ' ', du.last_name) AS doctor_name,
-				       CONCAT(pu.first_name, ' ', pu.last_name) AS patient_name,
-				       a.appointment_date AS appointment_date
+					   CONCAT(du.first_name, ' ', du.last_name) AS doctor_name,
+					   CONCAT(pu.first_name, ' ', pu.last_name) AS patient_name,
+					   a.appointment_date AS appointment_date
 				FROM ratings r
 				LEFT JOIN appointments a ON a.id = r.appointment_id
 				LEFT JOIN users du ON du.id = r.doctor_id
@@ -165,8 +159,8 @@ public class RatingDAO {
 		List<Rating> ratings = new ArrayList<>();
 		String sql = """
 				SELECT r.id, r.patient_id, r.doctor_id, r.appointment_id, r.score, r.review, r.created_at,
-				       CONCAT(du.first_name, ' ', du.last_name) AS doctor_name,
-				       a.appointment_date AS appointment_date
+					   CONCAT(du.first_name, ' ', du.last_name) AS doctor_name,
+					   a.appointment_date AS appointment_date
 				FROM ratings r
 				LEFT JOIN appointments a ON a.id = r.appointment_id
 				LEFT JOIN users du ON du.id = r.doctor_id
@@ -189,9 +183,9 @@ public class RatingDAO {
 		List<Rating> ratings = new ArrayList<>();
 		String sql = """
 				SELECT r.id, r.patient_id, r.doctor_id, r.appointment_id, r.score, r.review, r.created_at,
-				       CONCAT(du.first_name, ' ', du.last_name) AS doctor_name,
-				       CONCAT(pu.first_name, ' ', pu.last_name) AS patient_name,
-				       a.appointment_date AS appointment_date
+					   CONCAT(du.first_name, ' ', du.last_name) AS doctor_name,
+					   CONCAT(pu.first_name, ' ', pu.last_name) AS patient_name,
+					   a.appointment_date AS appointment_date
 				FROM ratings r
 				LEFT JOIN appointments a ON a.id = r.appointment_id
 				LEFT JOIN users du ON du.id = r.doctor_id
@@ -329,4 +323,5 @@ public class RatingDAO {
 		return "data:image/svg+xml;utf8," + URLEncoder.encode(svg, StandardCharsets.UTF_8);
 	}
 }
+
 

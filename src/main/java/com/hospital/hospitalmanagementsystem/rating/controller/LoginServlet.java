@@ -1,11 +1,11 @@
 package com.hospital.hospitalmanagementsystem.rating.controller;
 
-import com.hospital.hospitalmanagementsystem.rating.util.DBConnection;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import utils.DBConnection;
 
 import java.io.IOException;
 import java.io.PrintWriter;

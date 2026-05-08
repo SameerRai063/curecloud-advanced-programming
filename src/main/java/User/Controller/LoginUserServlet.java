@@ -5,6 +5,8 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.sql.Connection;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.mindrot.jbcrypt.BCrypt;
 import utils.DBConnection;
@@ -63,9 +65,18 @@ public class LoginUserServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
+            // Print stacktrace to server console for debugging
             e.printStackTrace();
-            response.sendRedirect("login.jsp?error=system_error");
-
+            // Include the exception message in the redirect for local debugging only
+            try {
+                String msg = e.getMessage() != null ? e.getMessage() : e.toString();
+                String enc = URLEncoder.encode(msg, StandardCharsets.UTF_8.name());
+                response.sendRedirect("login.jsp?error=system_error&reason=" + enc);
+            } catch (Exception ex) {
+                // Fallback: if encoding fails, redirect without reason
+                ex.printStackTrace();
+                response.sendRedirect("login.jsp?error=system_error");
+            }
         } finally {
             // Ensure the database connection is closed to prevent memory leaks
             try {
