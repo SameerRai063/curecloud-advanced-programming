@@ -1,0 +1,4 @@
+<!-- persistence.xml removed: ORM features disabled. This file was moved out of src/main/resources to removed_orm/ to avoid being included on the classpath. -->
+
+
+

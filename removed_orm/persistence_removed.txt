@@ -1,0 +1,7 @@
+/* persistence.xml removed: ORM features disabled.
+   This file was moved out of src/main/resources to removed_orm/ and renamed to persistence_removed.txt
+   so it is not processed as XML or included on the classpath. */
+
+
+
+

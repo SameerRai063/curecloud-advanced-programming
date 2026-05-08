@@ -57,8 +57,13 @@ public class ViewRatingServlet extends HttpServlet {
 
 			request.setAttribute("ratings", ratings);
 			if (AuthUtil.isAdmin(request)) {
+				// ADMIN: show admin view (all ratings)
 				request.getRequestDispatcher("/rating/view-ratings.jsp").forward(request, response);
+			} else if (AuthUtil.isDoctor(request)) {
+				// DOCTOR: show doctor-specific ratings page
+				request.getRequestDispatcher("/rating/doctor-ratings.jsp").forward(request, response);
 			} else {
+				// PATIENT or others: show patient ratings page
 				request.getRequestDispatcher("/rating/patient-ratings.jsp").forward(request, response);
 			}
 		} catch (Exception e) {
