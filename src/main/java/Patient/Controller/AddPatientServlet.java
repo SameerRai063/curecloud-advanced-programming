@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -30,7 +31,9 @@ public class AddPatientServlet extends HttpServlet {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
             String bloodGroup = request.getParameter("bloodGroup");
-
+            String dob = request.getParameter("dob");
+            String address = request.getParameter("address");
+            String phone =  request.getParameter("phone");
             // ===== BCRYPT PASSWORD =====
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
@@ -41,11 +44,13 @@ public class AddPatientServlet extends HttpServlet {
             // ===== USER OBJECT =====
             User user = new User();
             user.setName(name);
+            user.setPhone(phone);
             user.setGender(gender);
             user.setEmail(email);
             user.setPassword(hashedPassword);
             user.setRole("patient");
-
+            user.setAddress(address);
+            user.setDob(Date.valueOf(dob));
             // ===== USER DAO (INTERFACE USED) =====
             UserDAO userDAO = new UserDAO(con);
             int userId = userDAO.addUser(user);

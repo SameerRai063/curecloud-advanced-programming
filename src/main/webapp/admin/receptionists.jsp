@@ -99,12 +99,26 @@
   <div class="sidebar-top">
     <div class="brand"><h1>Upachaar</h1><p>Clinical Oversight</p></div>
     <ul class="nav-menu">
-      <li class="nav-item"><a href="dashboard.jsp" class="nav-link"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
-      <li class="nav-item"><a href="doctors.jsp" class="nav-link"><i class="fa-solid fa-stethoscope"></i> Doctors</a></li>
-      <li class="nav-item"><a href="patients.jsp" class="nav-link"><i class="fa-solid fa-users"></i> Patients</a></li>
-      <li class="nav-item active"><a href="receptionists.jsp" class="nav-link"><i class="fa-solid fa-user-nurse"></i> Receptionists</a></li>
-      <li class="nav-item"><a href="appointments.jsp" class="nav-link"><i class="fa-regular fa-calendar"></i> Appointments</a></li>
-      <li class="nav-item"><a href="billing.jsp" class="nav-link"><i class="fa-solid fa-file-invoice-dollar"></i> Billing</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/Admin-dashboard" class="nav-link">
+          <i class="fa-solid fa-border-all">
+        </i> Dashboard</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/doctors" class="nav-link">
+          <i class="fa-solid fa-stethoscope">
+        </i> Doctors</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/patients" class="nav-link">
+          <i class="fa-solid fa-users"></i> Patients</a></li>
+      <li class="nav-item active">
+        <a href="<%= request.getContextPath() %>/receptionists" class="nav-link">
+          <i class="fa-solid fa-user-nurse"></i> Receptionists</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/appointments" class="nav-link">
+          <i class="fa-regular fa-calendar"></i> Appointments</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/billing" class="nav-link">
+          <i class="fa-solid fa-file-invoice-dollar"></i> Billing</a></li>
     </ul>
   </div>
   <div class="sidebar-bottom">
@@ -152,21 +166,31 @@
       <div class="stat-card" style="background: var(--card-bg-1);">
         <div class="stat-info">
           <h3>TOTAL RECEPTIONISTS</h3>
-          <div class="value">${not empty totalStaff ? totalStaff : 0} <span class="subtext">registered</span></div>
+          <div class="value">
+            ${not empty totalReceptionists ? totalReceptionists : 0}
+            <span class="subtext">registered</span>
+          </div>
         </div>
         <i class="fa-solid fa-user-group stat-icon"></i>
       </div>
+
       <div class="stat-card" style="background: var(--card-bg-2);">
         <div class="stat-info">
-          <h3>ON DUTY</h3>
-          <div class="value">${not empty onDutyCount ? onDutyCount : 0} <span class="badge">Available</span></div>
+          <h3>ACTIVE</h3>
+          <div class="value">
+            ${not empty activeReceptionists ? activeReceptionists : 0}
+            <span class="badge">Available</span>
+          </div>
         </div>
         <i class="fa-solid fa-user-check stat-icon"></i>
       </div>
+
       <div class="stat-card" style="background: var(--card-bg-3);">
         <div class="stat-info">
-          <h3>OFF DUTY</h3>
-          <div class="value">${not empty offDutyCount ? offDutyCount : 0}</div>
+          <h3>ON LEAVE</h3>
+          <div class="value">
+            ${not empty onLeaveReceptionists ? onLeaveReceptionists : 0}
+          </div>
         </div>
         <i class="fa-solid fa-user-minus stat-icon"></i>
       </div>
@@ -186,7 +210,7 @@
           <th>RECEPTIONIST ID</th>
           <th>NAME</th>
           <th>CONTACT</th>
-          <th>SHIFT</th>
+          <th>JOIN DATE</th>
           <th>STATUS</th>
           <th>ACTIONS</th>
         </tr>
@@ -195,30 +219,47 @@
         <c:choose>
           <c:when test="${empty receptionistList}">
             <tr>
-              <td colspan="6" class="empty-state">No receptionists found matching this criteria.</td>
+              <td colspan="6" class="empty-state">
+                No receptionists found matching this criteria.
+              </td>
             </tr>
           </c:when>
+
           <c:otherwise>
             <c:forEach var="receptionist" items="${receptionistList}">
               <tr>
-                <td>${receptionist.id}</td>
-                <td>${receptionist.name}</td>
-                <td>${receptionist.contact}</td>
-                <td>${receptionist.shift}</td>
+                <td>${receptionist.user.id}</td>
+                <td>${receptionist.user.name}</td>
+                <td>${receptionist.user.phone}</td>
+                <td>${receptionist.user.createdAt}</td>
+
                 <td>
                   <c:choose>
-                    <c:when test="${receptionist.status == 'On Duty'}">
-                      <span class="badge" style="background-color: #d1fae5; color: #065f46;">On Duty</span>
+                    <c:when test="${receptionist.status == 'active'}">
+              <span class="badge" style="background-color: #d1fae5; color: #065f46;">
+                Active
+              </span>
                     </c:when>
                     <c:otherwise>
-                      <span class="badge" style="background-color: #fce7f3; color: #9d174d;">Off Duty</span>
+              <span class="badge" style="background-color: #fce7f3; color: #9d174d;">
+                On Leave
+              </span>
                     </c:otherwise>
                   </c:choose>
                 </td>
+
                 <td>
-                  <a href="viewReceptionist.jsp?id=${receptionist.id}" class="action-icon icon-view"><i class="fa-solid fa-eye"></i></a>
-                  <a href="editReceptionist.jsp?id=${receptionist.id}" class="action-icon icon-edit"><i class="fa-solid fa-pen"></i></a>
-                  <a href="deleteReceptionist.jsp?id=${receptionist.id}" class="action-icon icon-delete"><i class="fa-solid fa-trash"></i></a>
+                  <a href="viewReceptionist.jsp?id=${receptionist.user.id}" class="action-icon icon-view">
+                    <i class="fa-solid fa-eye"></i>
+                  </a>
+
+                  <a href="editReceptionist.jsp?id=${receptionist.user.id}" class="action-icon icon-edit">
+                    <i class="fa-solid fa-pen"></i>
+                  </a>
+
+                  <a href="deleteReceptionist?id=${receptionist.user.id}" class="action-icon icon-delete">
+                    <i class="fa-solid fa-trash"></i>
+                  </a>
                 </td>
               </tr>
             </c:forEach>

@@ -34,7 +34,7 @@ public class ReceptionistDAO implements ReceptionistInterface {
 
         // SQL JOIN to fetch User details AND Receptionist details
         String sql = "SELECT u.id, u.name, u.gender, u.dob, u.address, u.phone, u.email, " +
-                "u.profileImage, u.role, u.createdAt, u.updatedAt, " +
+                "u.profile_image, u.role, u.created_at, u.updated_at, " +
                 "r.status " +
                 "FROM users u " +
                 "INNER JOIN receptionist r ON u.id = r.user_id";
@@ -52,10 +52,10 @@ public class ReceptionistDAO implements ReceptionistInterface {
             user.setAddress(rs.getString("address"));
             user.setPhone(rs.getString("phone"));
             user.setEmail(rs.getString("email"));
-            user.setProfileImage(rs.getString("profileImage"));
+            user.setProfileImage(rs.getString("profile_image"));
             user.setRole(rs.getString("role"));
-            user.setCreatedAt(rs.getTimestamp("createdAt"));
-            user.setUpdatedAt(rs.getTimestamp("updatedAt"));
+            user.setCreatedAt(rs.getTimestamp("created_at"));
+            user.setUpdatedAt(rs.getTimestamp("updated_at"));
 
             // 2. Build the Receptionist object
             Receptionist receptionist = new Receptionist();
@@ -85,5 +85,61 @@ public class ReceptionistDAO implements ReceptionistInterface {
         ps.setString(1, receptionist.getStatus());
         ps.setInt(2, receptionist.getUserId());
         return ps.executeUpdate() > 0;
+    }
+    @Override
+    public int getTotalReceptionists() throws Exception {
+        String sql = "SELECT COUNT(*) FROM users WHERE role = 'receptionist'";
+        try (PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
+    @Override
+    public int countActiveReceptionists() {
+
+        int count = 0;
+
+        String sql = "SELECT COUNT(*) FROM receptionist WHERE status = ?";
+
+        try {
+
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, "active");
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+    @Override
+    public int countOnLeaveReceptionists() {
+
+        int count = 0;
+
+        String sql = "SELECT COUNT(*) FROM receptionist WHERE status = ?";
+
+        try {
+
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, "on leave");
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return count;
     }
 }

@@ -2,16 +2,18 @@
 <%@ page import="java.time.LocalDate" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%
-    // Example of dynamic data you can pass from a servlet
-    String userName = (session.getAttribute("userName") != null) ? (String) session.getAttribute("userName") : "Samir";
-    String userRole = (session.getAttribute("userRole") != null) ? (String) session.getAttribute("userRole") : "Super Admin";
+    String userName    = (session.getAttribute("userName") != null) ? (String) session.getAttribute("userName") : "Admin";
+    String userRole    = (session.getAttribute("userRole") != null) ? (String) session.getAttribute("userRole") : "Super Admin";
     String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy"));
 
-    // Mock statistics
-    int totalDoctors = 24;
-    int totalPatients = 156;
-    int appointmentsToday = 12;
-    String pendingInvoices = "NPR 45,000"; // This variable now represents Total Amount
+    // FIX: read real data from AdminDashboardServlet instead of hardcoded mock values
+    int    totalDoctors       = (request.getAttribute("totalDoctors")       != null) ? (Integer) request.getAttribute("totalDoctors")       : 0;
+    int    totalPatients      = (request.getAttribute("totalPatients")      != null) ? (Integer) request.getAttribute("totalPatients")      : 0;
+    int    totalReceptionists = (request.getAttribute("totalReceptionists") != null) ? (Integer) request.getAttribute("totalReceptionists") : 0;
+    double totalRevenue       = (request.getAttribute("totalRevenue")       != null) ? (Double)  request.getAttribute("totalRevenue")       : 0.0;
+
+    // Error surfacing — remove after confirming everything works
+    String errorMessage = (String) request.getAttribute("errorMessage");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,7 +53,6 @@
             overflow: hidden;
         }
 
-        /* --- Sidebar Styles --- */
         .sidebar {
             width: 250px;
             background-color: var(--primary-blue);
@@ -62,9 +63,7 @@
             flex-shrink: 0;
         }
 
-        .sidebar-top {
-            padding: 24px 16px;
-        }
+        .sidebar-top { padding: 24px 16px; }
 
         .brand h1 {
             font-size: 22px;
@@ -79,13 +78,9 @@
             margin-bottom: 32px;
         }
 
-        .nav-menu {
-            list-style: none;
-        }
+        .nav-menu { list-style: none; }
 
-        .nav-item {
-            margin-bottom: 4px;
-        }
+        .nav-item { margin-bottom: 4px; }
 
         .nav-link {
             display: flex;
@@ -115,9 +110,7 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .sidebar-bottom {
-            padding: 20px 16px;
-        }
+        .sidebar-bottom { padding: 20px 16px; }
 
         .social-links {
             margin-bottom: 24px;
@@ -159,26 +152,16 @@
             text-transform: uppercase;
         }
 
-        .user-info h4 {
-            font-size: 13px;
-            font-weight: 600;
-        }
+        .user-info h4 { font-size: 13px; font-weight: 600; }
+        .user-info p  { font-size: 11px; color: var(--sidebar-text-muted); }
 
-        .user-info p {
-            font-size: 11px;
-            color: var(--sidebar-text-muted);
-        }
-
-        /* --- Main Content Area --- */
         .main-wrapper {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            position: relative;
         }
 
-        /* --- Header Styles --- */
         .topbar {
             height: 64px;
             background-color: white;
@@ -190,27 +173,13 @@
             flex-shrink: 0;
         }
 
-        .topbar-left {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--primary-teal);
-        }
+        .topbar-left { font-size: 16px; font-weight: 600; color: var(--primary-teal); }
 
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+        .topbar-right { display: flex; align-items: center; gap: 20px; }
 
-        .date {
-            font-size: 13px;
-            color: var(--text-gray);
-        }
+        .date { font-size: 13px; color: var(--text-gray); }
 
-        .topbar-icons {
-            display: flex;
-            align-items: center;
-        }
+        .topbar-icons { display: flex; align-items: center; }
 
         .topbar-icons i {
             font-size: 18px;
@@ -229,14 +198,8 @@
             font-weight: 500;
             cursor: pointer;
             margin-left: 16px;
-            transition: all 0.2s;
         }
 
-        .btn-support:hover {
-            background-color: #dcfce7;
-        }
-
-        /* --- Content Area Styles --- */
         .content {
             padding: 32px;
             overflow-y: auto;
@@ -244,9 +207,7 @@
             background-color: #fdfdfd;
         }
 
-        .page-header {
-            margin-bottom: 24px;
-        }
+        .page-header { margin-bottom: 24px; }
 
         .page-header h2 {
             font-size: 26px;
@@ -255,12 +216,8 @@
             margin-bottom: 4px;
         }
 
-        .page-header p {
-            font-size: 14px;
-            color: var(--text-gray);
-        }
+        .page-header p { font-size: 14px; color: var(--text-gray); }
 
-        /* --- Stats Grid --- */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -292,12 +249,8 @@
             color: var(--text-dark);
         }
 
-        .stat-icon {
-            color: var(--primary-teal);
-            font-size: 22px;
-        }
+        .stat-icon { color: var(--primary-teal); font-size: 22px; }
 
-        /* --- Cards --- */
         .card {
             background-color: white;
             border: 1px solid var(--border-color);
@@ -314,7 +267,6 @@
             color: #1a202c;
         }
 
-        /* Quick Actions */
         .quick-actions-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -330,15 +282,13 @@
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
             text-align: center;
+            text-decoration: none;
+            display: block;
         }
 
-        .btn-quick-action:hover {
-            background-color: #16a086;
-        }
+        .btn-quick-action:hover { background-color: #16a086; }
 
-        /* Recent Activity */
         .recent-activity-container {
             min-height: 150px;
             display: flex;
@@ -348,6 +298,15 @@
             font-size: 14px;
         }
 
+        .error-banner {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -360,33 +319,34 @@
         </div>
 
         <ul class="nav-menu">
+            <%-- FIX: all links use getContextPath() so they work from any URL --%>
             <li class="nav-item active">
-                <a href="<%= request.getContextPath() %>/admin/dashboard.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/Admin-dashboard" class="nav-link">
                     <i class="fa-solid fa-border-all"></i> Dashboard
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<%= request.getContextPath() %>/doctors.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/doctors" class="nav-link">
                     <i class="fa-solid fa-stethoscope"></i> Doctors
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<%= request.getContextPath() %>/patients.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/patients" class="nav-link">
                     <i class="fa-solid fa-users"></i> Patients
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<%= request.getContextPath() %>/receptionists.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/receptionists" class="nav-link">
                     <i class="fa-solid fa-user-nurse"></i> Receptionists
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<%= request.getContextPath() %>/admin/appointments.jspts.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/appointments" class="nav-link">
                     <i class="fa-regular fa-calendar"></i> Appointments
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<%= request.getContextPath() %>/admin/billing.jspng.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/billing" class="nav-link">
                     <i class="fa-solid fa-file-invoice-dollar"></i> Billing
                 </a>
             </li>
@@ -402,7 +362,7 @@
         </div>
 
         <div class="user-profile">
-            <div class="avatar"><%= userName.substring(0, 1) %></div>
+            <div class="avatar"><%= userName.substring(0, 1).toUpperCase() %></div>
             <div class="user-info">
                 <h4><%= userName %></h4>
                 <p><%= userRole %></p>
@@ -414,9 +374,7 @@
 <div class="main-wrapper">
 
     <header class="topbar">
-        <div class="topbar-left">
-            Dashboard
-        </div>
+        <div class="topbar-left">Dashboard</div>
         <div class="topbar-right">
             <span class="date"><%= currentDate %></span>
             <div class="topbar-icons">
@@ -429,11 +387,19 @@
 
     <main class="content">
 
+        <%-- Error banner — remove after confirming fix --%>
+        <% if (errorMessage != null) { %>
+        <div class="error-banner">
+            <strong>Error:</strong> <%= errorMessage %>
+        </div>
+        <% } %>
+
         <div class="page-header">
-            <h2>Welcome to Upachaar</h2>
+            <h2>Welcome, <%= userName %>!</h2>
             <p>Clinical Oversight Dashboard</p>
         </div>
 
+        <%-- FIX: replaced all hardcoded mock values with real servlet data --%>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-info">
@@ -457,36 +423,34 @@
 
             <div class="stat-card">
                 <div class="stat-info">
-                    <h3>Appointments Today</h3>
-                    <div class="value"><%= appointmentsToday %></div>
+                    <h3>Total Receptionists</h3>
+                    <div class="value"><%= totalReceptionists %></div>
                 </div>
                 <div class="stat-icon">
-                    <i class="fa-regular fa-calendar-check"></i>
+                    <i class="fa-solid fa-user-nurse"></i>
                 </div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-info">
-                    <h3>Total Amount</h3> <!-- Changed from Pending Invoices -->
-                    <div class="value"><%= pendingInvoices %></div>
+                    <h3>Total Revenue</h3>
+                    <div class="value">NPR <%= String.format("%,.2f", totalRevenue) %></div>
                 </div>
                 <div class="stat-icon">
-                    <i class="fa-solid fa-file-invoice"></i>
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
                 </div>
             </div>
         </div>
 
         <div class="card">
             <h3 class="card-title">Quick Actions</h3>
-            <form action="quickActions" method="POST">
-                <div class="quick-actions-grid">
-                    <button type="submit" name="action" value="addDoctor" class="btn-quick-action">Add Doctor</button>
-                    <button type="submit" name="action" value="addPatient" class="btn-quick-action">Add Patient</button>
-                    <!-- Changed from Schedule Appointment to Add Appointment -->
-                    <button type="submit" name="action" value="schedule" class="btn-quick-action">Add Appointment</button>
-                    <button type="submit" name="action" value="viewBilling" class="btn-quick-action">View Billing</button>
-                </div>
-            </form>
+            <div class="quick-actions-grid">
+                <%-- FIX: direct links instead of a single form with action values --%>
+                <a href="<%= request.getContextPath() %>/admin/addDoctor.jsp"   class="btn-quick-action">Add Doctor</a>
+                <a href="<%= request.getContextPath() %>/admin/addPatient.jsp"  class="btn-quick-action">Add Patient</a>
+                <a href="<%= request.getContextPath() %>/appointments"          class="btn-quick-action">Schedule Appointment</a>
+                <a href="<%= request.getContextPath() %>/billing"               class="btn-quick-action">View Billing</a>
+            </div>
         </div>
 
         <div class="card">

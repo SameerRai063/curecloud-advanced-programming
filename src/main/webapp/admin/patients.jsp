@@ -398,32 +398,32 @@
 
         <ul class="nav-menu">
             <li class="nav-item">
-                <a href="dashboard.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/Admin-dashboard" class="nav-link">
                     <i class="fa-solid fa-border-all"></i> Dashboard
                 </a>
             </li>
             <li class="nav-item">
-                <a href="doctors.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/doctors" class="nav-link">
                     <i class="fa-solid fa-stethoscope"></i> Doctors
                 </a>
             </li>
             <li class="nav-item active">
-                <a href="patients.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/patients" class="nav-link">
                     <i class="fa-solid fa-users"></i> Patients
                 </a>
             </li>
             <li class="nav-item">
-                <a href="receptionists.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/receptionist" class="nav-link">
                     <i class="fa-solid fa-user-nurse"></i> Receptionists
                 </a>
             </li>
             <li class="nav-item">
-                <a href="appointments.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/appointments" class="nav-link">
                     <i class="fa-regular fa-calendar"></i> Appointments
                 </a>
             </li>
             <li class="nav-item">
-                <a href="billing.jsp" class="nav-link">
+                <a href="<%= request.getContextPath() %>/billing" class="nav-link">
                     <i class="fa-solid fa-file-invoice-dollar"></i> Billing
                 </a>
             </li>
@@ -490,7 +490,7 @@
                     <th>AGE</th>
                     <th>GENDER</th>
                     <th>PHONE</th>
-                    <th>LAST VISIT</th>
+                    <th>BLOOD GROUP</th>
                     <th>ACTIONS</th>
                 </tr>
                 </thead>
@@ -506,16 +506,30 @@
                     <c:otherwise>
                         <c:forEach var="patient" items="${patientList}">
                             <tr>
-                                <td>${patient.id}</td>
-                                <td>${patient.name}</td>
-                                <td>${patient.age}</td>
-                                <td>${patient.gender}</td>
-                                <td>${patient.phone}</td>
-                                <td>${patient.lastVisit}</td>
+                                <td>${patient.user.id}</td>
+                                <td>${patient.user.name}</td>
                                 <td>
-                                    <a href="viewPatient.jsp?id=${patient.id}" style="color: var(--primary-teal); margin-right: 10px;"><i class="fa-solid fa-eye"></i></a>
-                                    <a href="editPatient.jsp?id=${patient.id}" style="color: var(--primary-blue); margin-right: 10px;"><i class="fa-solid fa-pen"></i></a>
-                                    <a href="deletePatient.jsp?id=${patient.id}" style="color: #ef4444;"><i class="fa-solid fa-trash"></i></a>
+                                    <c:choose>
+                                        <c:when test="${not empty patient.user.dob}">
+                                            ${2026 - patient.user.dob.year - 1900}
+                                        </c:when>
+                                        <c:otherwise>--</c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>${patient.user.gender}</td>
+                                <td>${patient.user.phone}</td>
+                                <td>${patient.bloodGroup}</td>
+
+                                <td>
+                                    <a href="viewPatient.jsp?id=${patient.user.id}" style="color: var(--primary-teal); margin-right: 10px;">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <a href="editPatient.jsp?id=${patient.user.id}" style="color: var(--primary-blue); margin-right: 10px;">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <a href="deletePatient?id=${patient.user.id}" style="color: #ef4444;">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         </c:forEach>

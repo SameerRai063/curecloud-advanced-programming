@@ -6,5 +6,6 @@ public interface PatientInterface {
     boolean addPatient(Patient patient) throws Exception;
     boolean deletePatient(int userId) throws Exception;
     boolean updatePatient(Patient patient) throws Exception;
+    int getTotalPatients() throws Exception;
     List<Patient> getAllPatients() throws Exception;
 }

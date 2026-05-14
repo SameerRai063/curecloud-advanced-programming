@@ -15,15 +15,20 @@ public class UserDAO implements UserInterface {
     @Override
     public int addUser(User user) throws Exception {
 
-        String sql = "INSERT INTO users(name, gender, email, password, role) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users(name, gender, dob, address, phone, email, password, profile_image, role) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
         ps.setString(1, user.getName());
         ps.setString(2, user.getGender());
-        ps.setString(3, user.getEmail());
-        ps.setString(4, user.getPassword());
-        ps.setString(5, user.getRole());
+        ps.setDate(3, user.getDob());
+        ps.setString(4, user.getAddress());
+        ps.setString(5, user.getPhone());
+        ps.setString(6, user.getEmail());
+        ps.setString(7, user.getPassword());
+        ps.setString(8, user.getProfileImage());
+        ps.setString(9, user.getRole());
 
         ps.executeUpdate();
 

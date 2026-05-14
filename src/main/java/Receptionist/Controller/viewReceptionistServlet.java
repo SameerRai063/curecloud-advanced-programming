@@ -3,48 +3,47 @@ package Receptionist.Controller;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.WebServlet;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
 
-import utils.DBConnection;
 import Receptionist.Model.Receptionist;
 import Receptionist.Model.dao.ReceptionistDAO;
+import utils.DBConnection;
 
-@WebServlet("/view-receptionists")
+@WebServlet("/receptionists")
 public class viewReceptionistServlet extends HttpServlet {
 
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        Connection con = null;
-
         try {
-            con = DBConnection.getConnection();
-            ReceptionistDAO receptionistDAO = new ReceptionistDAO(con);
+            // 1. Get DB connection
+            Connection con = DBConnection.getConnection();
 
-            // 1. Fetch the list of all receptionists from the database
-            List<Receptionist> receptionistList = receptionistDAO.getAllReceptionists();
+            // 2. Create DAO
+            ReceptionistDAO dao = new ReceptionistDAO(con);
 
-            // 2. Attach the list to the request object
-            request.setAttribute("receptionists", receptionistList);
+            // 3. Fetch all data
+            List<Receptionist> receptionistList = dao.getAllReceptionists();
+            int total = dao.getTotalReceptionists();
+            int active = dao.countActiveReceptionists();
+            int onLeave = dao.countOnLeaveReceptionists();
 
-            // 3. Forward the request to your JSP page
-            RequestDispatcher dispatcher = request.getRequestDispatcher("receptionist_list.jsp");
-            dispatcher.forward(request, response);
+            // 4. Set attributes
+            request.setAttribute("receptionistList", receptionistList);
+            request.setAttribute("totalReceptionists", total);
+            request.setAttribute("activeReceptionists", active);
+            request.setAttribute("onLeaveReceptionists", onLeave);
+
+            // 5. Forward to JSP
+            RequestDispatcher rd = request.getRequestDispatcher("/admin/receptionists.jsp");
+            rd.forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("admin_dashboard.jsp?error=database_error");
-        } finally {
-            try {
-                if (con != null) {
-                    con.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            response.getWriter().println("Error: " + e.getMessage());
         }
     }
 }

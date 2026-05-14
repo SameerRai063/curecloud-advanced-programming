@@ -1,17 +1,16 @@
 package Doctor.Controller;
-
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
-
+import java.util.Map;
 import utils.DBConnection;
 import Doctor.Model.Doctor;
 import Doctor.Model.dao.DoctorDAO;
 
-@WebServlet("/view-doctors")
+@WebServlet("/doctors")
 public class viewDoctorsServlet extends HttpServlet {
 
     @Override
@@ -24,25 +23,37 @@ public class viewDoctorsServlet extends HttpServlet {
             con = DBConnection.getConnection();
             DoctorDAO doctorDAO = new DoctorDAO(con);
 
-            // 1. Fetch the list of all doctors from the database
-            List<Doctor> doctorList = doctorDAO.getAllDoctors();
+            // 1. Get doctor list
+            List<Doctor> doctorsList = doctorDAO.getAllDoctors();
 
-            // 2. Attach the list to the request object
-            request.setAttribute("doctors", doctorList);
+            // 2. Get stats
+            Map<String, Integer> stats = doctorDAO.getDoctorStats();
 
-            // 3. Forward the request to your JSP page
-            RequestDispatcher dispatcher = request.getRequestDispatcher("doctor_list.jsp");
-            dispatcher.forward(request, response);
+            // 3. Set attributes for JSP
+            request.setAttribute("doctorsList",  doctorsList);
+            request.setAttribute("totalDoctors", stats.get("total"));
+            request.setAttribute("activeToday",  stats.get("active"));
+            request.setAttribute("onLeave",      stats.get("onLeave"));
+
+            // Debug logs — remove after confirming fix
+            System.out.println("[viewDoctorsServlet] Doctors fetched: " + doctorsList.size());
+            System.out.println("[viewDoctorsServlet] Total stat: "      + stats.get("total"));
+
+            // 4. Forward to JSP
+            RequestDispatcher rd = request.getRequestDispatcher("/admin/doctors.jsp");
+            rd.forward(request, response);
 
         } catch (Exception e) {
+            // FIX: Don't silently redirect — expose the real error message in the JSP
             e.printStackTrace();
-            // Redirect to an error page or admin dashboard if something goes wrong
-            response.sendRedirect("admin_dashboard.jsp?error=database_error");
+            request.setAttribute("errorMessage", e.getMessage());
+            request.setAttribute("errorClass",   e.getClass().getName());
+            RequestDispatcher rd = request.getRequestDispatcher("/admin/doctors.jsp");
+            rd.forward(request, response);
+
         } finally {
             try {
-                if (con != null) {
-                    con.close();
-                }
+                if (con != null) con.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }

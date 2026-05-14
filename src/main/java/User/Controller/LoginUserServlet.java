@@ -18,8 +18,9 @@ public class LoginUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String email = request.getParameter("email");
+        String email         = request.getParameter("email");
         String plainPassword = request.getParameter("password");
+        String ctx           = request.getContextPath();
 
         Connection con = null;
 
@@ -30,48 +31,50 @@ public class LoginUserServlet extends HttpServlet {
             // 1. Fetch the user from the database by email
             User user = userDAO.getUserByEmail(email);
 
-            // 2. Check if user exists AND if the plain password matches the hashed password
+            // 2. Check if user exists AND password matches
             if (user != null && BCrypt.checkpw(plainPassword, user.getPassword())) {
 
-                // Login Successful! Create the session
+                // Login successful — create session
                 HttpSession session = request.getSession();
                 session.setAttribute("loggedInUser", user);
 
-                // Route to the correct dashboard based on their role
+                // FIX: store name and role so JSP sidebar can display them
+                session.setAttribute("userName", user.getName());
+                session.setAttribute("userRole", user.getRole());
+
+                // FIX: redirect through /dashboard servlet (not directly to JSP)
+                //      so dashboard stats are fetched before the page renders
                 String role = user.getRole();
 
                 if ("patient".equalsIgnoreCase(role)) {
-                    response.sendRedirect("patient_dashboard.jsp");
+                    response.sendRedirect(ctx + "/Admin-dashboard");
 
                 } else if ("admin".equalsIgnoreCase(role)) {
-                    response.sendRedirect("admin_dashboard.jsp");
+                    response.sendRedirect(ctx + "/Admin-dashboard");
 
                 } else if ("doctor".equalsIgnoreCase(role)) {
-                    response.sendRedirect("doctor_dashboard.jsp");
+                    response.sendRedirect(ctx + "/Admin-dashboard");
 
                 } else if ("receptionist".equalsIgnoreCase(role)) {
-                    response.sendRedirect("receptionist_dashboard.jsp");
+                    response.sendRedirect(ctx + "/Admin-dashboard");
 
                 } else {
                     // Fallback for unknown roles
-                    response.sendRedirect("index.jsp");
+                    response.sendRedirect(ctx + "/login.jsp");
                 }
 
             } else {
-                // Login Failed! Incorrect email or password
-                response.sendRedirect("login.jsp?error=invalid_credentials");
+                // Login failed — wrong email or password
+                response.sendRedirect(ctx + "/login.jsp?error=invalid_credentials");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("login.jsp?error=system_error");
+            response.sendRedirect(ctx + "/login.jsp?error=system_error");
 
         } finally {
-            // Ensure the database connection is closed to prevent memory leaks
             try {
-                if (con != null) {
-                    con.close();
-                }
+                if (con != null) con.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -17,7 +17,6 @@ public class User {
     private String role;
     private Timestamp createdAt;
     private Timestamp updatedAt;
-
     // Constructor (Empty)
     public User() {}
 

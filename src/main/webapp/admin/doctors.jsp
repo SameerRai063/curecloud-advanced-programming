@@ -2,19 +2,28 @@
 <%@ page import="java.time.LocalDate" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.util.List" %>
+<%@ page import="Doctor.Model.Doctor" %>
 <%
-  // Mock user session data
-  String userName = (session.getAttribute("userName") != null) ? (String) session.getAttribute("userName") : "Samir";
+  // Session data
+  String userName = (session.getAttribute("userName") != null) ? (String) session.getAttribute("userName") : "Admin";
   String userRole = (session.getAttribute("userRole") != null) ? (String) session.getAttribute("userRole") : "Super Admin";
   String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy"));
 
-  // Mock statistics (ideally fetched from backend/database)
+  // FIX: Null-safe attribute retrieval with defaults
   int totalDoctors = (request.getAttribute("totalDoctors") != null) ? (Integer) request.getAttribute("totalDoctors") : 0;
-  int activeToday = (request.getAttribute("activeToday") != null) ? (Integer) request.getAttribute("activeToday") : 0;
-  int onLeave = (request.getAttribute("onLeave") != null) ? (Integer) request.getAttribute("onLeave") : 0;
+  int activeToday  = (request.getAttribute("activeToday")  != null) ? (Integer) request.getAttribute("activeToday")  : 0;
+  int onLeave      = (request.getAttribute("onLeave")      != null) ? (Integer) request.getAttribute("onLeave")      : 0;
 
-  // Mock doctor list (replace generic List with actual Doctor model)
-  List<?> doctorsList = (List<?>) request.getAttribute("doctorsList");
+  // FIX: Safe cast of doctorsList attribute
+  List<Doctor> doctorsList = null;
+  Object obj = request.getAttribute("doctorsList");
+  if (obj != null) {
+    doctorsList = (List<Doctor>) obj;
+  }
+
+  // Error surfacing (remove after confirming fix)
+  String errorMessage = (String) request.getAttribute("errorMessage");
+  String errorClass   = (String) request.getAttribute("errorClass");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,7 +64,6 @@
       overflow: hidden;
     }
 
-    /* --- Sidebar Styles --- */
     .sidebar {
       width: 250px;
       background-color: var(--primary-blue);
@@ -66,9 +74,7 @@
       flex-shrink: 0;
     }
 
-    .sidebar-top {
-      padding: 24px 16px;
-    }
+    .sidebar-top { padding: 24px 16px; }
 
     .brand h1 {
       font-size: 22px;
@@ -83,13 +89,9 @@
       margin-bottom: 32px;
     }
 
-    .nav-menu {
-      list-style: none;
-    }
+    .nav-menu { list-style: none; }
 
-    .nav-item {
-      margin-bottom: 4px;
-    }
+    .nav-item { margin-bottom: 4px; }
 
     .nav-link {
       display: flex;
@@ -119,9 +121,7 @@
       background-color: rgba(255, 255, 255, 0.1);
     }
 
-    .sidebar-bottom {
-      padding: 20px 16px;
-    }
+    .sidebar-bottom { padding: 20px 16px; }
 
     .social-links {
       margin-bottom: 24px;
@@ -163,17 +163,9 @@
       text-transform: uppercase;
     }
 
-    .user-info h4 {
-      font-size: 13px;
-      font-weight: 600;
-    }
+    .user-info h4 { font-size: 13px; font-weight: 600; }
+    .user-info p  { font-size: 11px; color: var(--sidebar-text-muted); }
 
-    .user-info p {
-      font-size: 11px;
-      color: var(--sidebar-text-muted);
-    }
-
-    /* --- Main Content Area --- */
     .main-wrapper {
       flex: 1;
       display: flex;
@@ -182,7 +174,6 @@
       position: relative;
     }
 
-    /* --- Refined Header Styles --- */
     .topbar {
       height: 64px;
       background-color: white;
@@ -194,32 +185,12 @@
       flex-shrink: 0;
     }
 
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-left .title { font-size: 16px; font-weight: 600; color: var(--primary-teal); }
+    .topbar-left .divider { color: #d1d5db; }
+    .topbar-left .date { font-size: 13px; color: var(--text-gray); }
 
-    .topbar-left .title {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--primary-teal);
-    }
-
-    .topbar-left .divider {
-      color: #d1d5db;
-    }
-
-    .topbar-left .date {
-      font-size: 13px;
-      color: var(--text-gray);
-    }
-
-    .topbar-center {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-    }
+    .topbar-center { flex: 1; display: flex; justify-content: center; }
 
     .top-search {
       display: flex;
@@ -230,11 +201,7 @@
       width: 400px;
     }
 
-    .top-search i {
-      color: #9ca3af;
-      margin-right: 8px;
-      font-size: 14px;
-    }
+    .top-search i { color: #9ca3af; margin-right: 8px; font-size: 14px; }
 
     .top-search input {
       border: none;
@@ -245,21 +212,11 @@
       color: var(--text-dark);
     }
 
-    .top-search input::placeholder {
-      color: #9ca3af;
-    }
+    .top-search input::placeholder { color: #9ca3af; }
 
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
+    .topbar-right { display: flex; align-items: center; gap: 20px; }
 
-    .top-icon {
-      font-size: 18px;
-      color: var(--text-gray);
-      cursor: pointer;
-    }
+    .top-icon { font-size: 18px; color: var(--text-gray); cursor: pointer; }
 
     .btn-support {
       background-color: #f0fdf4;
@@ -272,7 +229,6 @@
       cursor: pointer;
     }
 
-    /* --- Content Area Styles --- */
     .content {
       padding: 32px;
       overflow-y: auto;
@@ -287,17 +243,8 @@
       margin-bottom: 24px;
     }
 
-    .page-title h2 {
-      font-size: 28px;
-      font-weight: 700;
-      color: #1a202c;
-      margin-bottom: 4px;
-    }
-
-    .page-title p {
-      font-size: 14px;
-      color: var(--text-gray);
-    }
+    .page-title h2 { font-size: 28px; font-weight: 700; color: #1a202c; margin-bottom: 4px; }
+    .page-title p  { font-size: 14px; color: var(--text-gray); }
 
     .btn-action {
       background-color: var(--primary-teal);
@@ -308,7 +255,6 @@
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      transition: opacity 0.2s;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -316,7 +262,6 @@
       text-decoration: none;
     }
 
-    /* --- New Stats Cards --- */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -357,16 +302,8 @@
       z-index: 2;
     }
 
-    .stat-num {
-      font-size: 28px;
-      font-weight: 700;
-      color: #111827;
-    }
-
-    .stat-label {
-      font-size: 13px;
-      color: var(--text-gray);
-    }
+    .stat-num { font-size: 28px; font-weight: 700; color: #111827; }
+    .stat-label { font-size: 13px; color: var(--text-gray); }
 
     .badge-available {
       background-color: #d1fae5;
@@ -377,7 +314,6 @@
       font-weight: 600;
     }
 
-    /* Decorative Background Shapes */
     .bg-shape {
       position: absolute;
       right: -20%;
@@ -388,16 +324,10 @@
       z-index: 1;
     }
 
-    .shape-blue { background-color: #f0f4ff; }
-    .shape-green { background-color: #ecfdf5; }
+    .shape-blue   { background-color: #f0f4ff; }
+    .shape-green  { background-color: #ecfdf5; }
     .shape-orange { background-color: #fff7ed; }
 
-    .stat-card i.fa-calendar {
-      font-size: 14px;
-      color: #ea580c;
-    }
-
-    /* --- Filter Tabs --- */
     .filter-tabs {
       display: flex;
       background-color: #f3f4f6;
@@ -426,11 +356,8 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    .filter-tab:hover:not(.active) {
-      color: var(--text-dark);
-    }
+    .filter-tab:hover:not(.active) { color: var(--text-dark); }
 
-    /* --- New Table Design --- */
     .table-container {
       background-color: white;
       border: 1px solid var(--border-color);
@@ -439,11 +366,7 @@
       overflow: hidden;
     }
 
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
+    .data-table { width: 100%; border-collapse: collapse; text-align: left; }
 
     .data-table th {
       background-color: var(--table-header-bg);
@@ -469,7 +392,16 @@
       font-size: 14px;
     }
 
-    /* --- Pagination --- */
+    .error-banner {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+      padding: 12px 20px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
     .pagination-bar {
       display: flex;
       justify-content: space-between;
@@ -478,16 +410,9 @@
       border-top: 1px solid var(--border-color);
     }
 
-    .pagination-info {
-      font-size: 13px;
-      color: var(--text-gray);
-    }
+    .pagination-info { font-size: 13px; color: var(--text-gray); }
 
-    .pagination-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .pagination-controls { display: flex; align-items: center; gap: 8px; }
 
     .page-btn {
       width: 32px;
@@ -503,11 +428,7 @@
       font-size: 14px;
     }
 
-    .page-btn.active {
-      background-color: var(--primary-teal);
-      color: white;
-    }
-
+    .page-btn.active { background-color: var(--primary-teal); color: white; }
   </style>
 </head>
 <body>
@@ -521,32 +442,32 @@
 
     <ul class="nav-menu">
       <li class="nav-item">
-        <a href="<%= request.getContextPath() %>/admin/dashboard.jsprd.jsp" class="nav-link">
+        <a href="<%= request.getContextPath() %>/Admin-dashboard" class="nav-link">
           <i class="fa-solid fa-border-all"></i> Dashboard
         </a>
       </li>
       <li class="nav-item active">
-        <a href="<%= request.getContextPath() %>/doctors.jsp" class="nav-link">
+        <a href="<%= request.getContextPath() %>/doctors" class="nav-link">
           <i class="fa-solid fa-stethoscope"></i> Doctors
         </a>
       </li>
       <li class="nav-item">
-        <a href="<%= request.getContextPath() %>/patients.jsp" class="nav-link">
+        <a href="<%= request.getContextPath() %>/patients" class="nav-link">
           <i class="fa-solid fa-users"></i> Patients
         </a>
       </li>
       <li class="nav-item">
-        <a href="<%= request.getContextPath() %>/receptionists.jsp" class="nav-link">
+        <a href="<%= request.getContextPath() %>/receptionists" class="nav-link">
           <i class="fa-solid fa-user-nurse"></i> Receptionists
         </a>
       </li>
       <li class="nav-item">
-        <a href="<%= request.getContextPath() %>/admin/appointments.jspts.jsp" class="nav-link">
+        <a href="<%= request.getContextPath() %>/appointments" class="nav-link">
           <i class="fa-regular fa-calendar"></i> Appointments
         </a>
       </li>
       <li class="nav-item">
-        <a href="<%= request.getContextPath() %>/admin/billing.jspng.jsp" class="nav-link">
+        <a href="<%= request.getContextPath() %>/billing" class="nav-link">
           <i class="fa-solid fa-file-invoice-dollar"></i> Billing
         </a>
       </li>
@@ -593,6 +514,13 @@
   </header>
 
   <main class="content">
+
+    <%-- FIX: Show DB error if something went wrong (remove this block after confirming fix) --%>
+    <% if (errorMessage != null) { %>
+    <div class="error-banner">
+      <strong>Database Error:</strong> [<%= errorClass %>] <%= errorMessage %>
+    </div>
+    <% } %>
 
     <div class="page-header">
       <div class="page-title">
@@ -654,22 +582,68 @@
         </tr>
         </thead>
         <tbody>
-        <% if (doctorsList == null || doctorsList.isEmpty()) { %>
+        <%
+          if (doctorsList == null || doctorsList.isEmpty()) {
+        %>
         <tr>
           <td colspan="6" class="empty-state">
-            No doctors found matching this criteria.
+            No doctors found.
           </td>
         </tr>
-        <% } else {
-          // Loop over actual doctors list here in reality
-          // Example: for(Doctor doc : doctorsList) { ... }
-        } %>
+        <%
+        } else {
+          for (Doctor doc : doctorsList) {
+        %>
+        <tr>
+          <td><%= doc.getUserId() %></td>
+
+          <td><%= doc.getUser() != null ? doc.getUser().getName() : "—" %></td>
+
+          <td><%= doc.getDepartment() != null ? doc.getDepartment() : "—" %></td>
+
+          <td><%= doc.getExperienceYears() %> yrs</td>
+
+          <td>
+            <%
+              String status = doc.getStatus();
+              if ("active".equalsIgnoreCase(status)) {
+            %>
+            <span style="background:#d1fae5;color:#065f46;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;">
+              Active
+            </span>
+            <%
+            } else if ("on leave".equalsIgnoreCase(status)) {
+            %>
+            <span style="background:#fee2e2;color:#991b1b;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;">
+              On Leave
+            </span>
+            <%
+            } else {
+            %>
+            <span style="background:#e5e7eb;color:#374151;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;">
+              Unknown
+            </span>
+            <%
+              }
+            %>
+          </td>
+
+          <td>
+            <button style="background:#0d7f6b;color:white;border:none;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;">
+              View
+            </button>
+          </td>
+        </tr>
+        <%
+            }
+          }
+        %>
         </tbody>
       </table>
 
       <div class="pagination-bar">
         <div class="pagination-info">
-          Showing <%= (totalDoctors > 0) ? "1" : "0" %>-<%= Math.min(10, totalDoctors) %> of <%= totalDoctors %> doctors
+          Showing <%= (totalDoctors > 0) ? "1" : "0" %>–<%= Math.min(10, totalDoctors) %> of <%= totalDoctors %> doctors
         </div>
         <div class="pagination-controls">
           <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>

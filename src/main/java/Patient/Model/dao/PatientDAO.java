@@ -36,7 +36,7 @@ public class PatientDAO implements PatientInterface {
 
         // We select the necessary columns from both tables
         String sql = "SELECT u.id, u.name, u.gender, u.dob, u.address, u.phone, u.email, " +
-                "u.profileImage, u.role, u.createdAt, u.updatedAt, " +
+                "u.profile_image, u.role, u.created_at, u.updated_at, " +
                 "p.blood_group, p.is_active " +
                 "FROM users u " +
                 "INNER JOIN patient p ON u.id = p.user_id";
@@ -54,10 +54,10 @@ public class PatientDAO implements PatientInterface {
             user.setAddress(rs.getString("address"));
             user.setPhone(rs.getString("phone"));
             user.setEmail(rs.getString("email"));
-            user.setProfileImage(rs.getString("profileImage"));
+            user.setProfileImage(rs.getString("profile_image"));
             user.setRole(rs.getString("role"));
-            user.setCreatedAt(rs.getTimestamp("createdAt"));
-            user.setUpdatedAt(rs.getTimestamp("updatedAt"));
+            user.setCreatedAt(rs.getTimestamp("created_at"));
+            user.setUpdatedAt(rs.getTimestamp("updated_at"));
 
             // 2. Create and populate the Patient object
             Patient patient = new Patient();
@@ -93,4 +93,13 @@ public class PatientDAO implements PatientInterface {
         ps.setInt(3, patient.getUserId());
         return ps.executeUpdate() > 0;
     }
+    @Override
+    public int getTotalPatients() throws Exception {
+        String sql = "SELECT COUNT(*) FROM users WHERE role = 'patient'";
+        try (PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
+
 }
