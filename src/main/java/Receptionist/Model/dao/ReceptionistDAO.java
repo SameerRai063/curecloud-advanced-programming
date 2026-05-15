@@ -2,7 +2,7 @@ package Receptionist.Model.dao;
 
 import Receptionist.Model.Receptionist;
 import User.Model.User;
-
+import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +73,8 @@ public boolean addReceptionist(Receptionist receptionist) throws Exception {
             userStmt.setString(4, user.getAddress());
             userStmt.setString(5, user.getPhone());
             userStmt.setString(6, user.getEmail());
-            userStmt.setString(7, user.getPassword());
+            String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+            userStmt.setString(7, hashedPassword);
             userStmt.setString(8, user.getProfileImage());
 
             int affectedRows = userStmt.executeUpdate();

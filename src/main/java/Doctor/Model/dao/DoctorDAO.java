@@ -2,7 +2,7 @@ package Doctor.Model.dao;
 
 import Doctor.Model.Doctor;
 import User.Model.User;
-
+import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -141,7 +141,8 @@ public class DoctorDAO implements DoctorInterface {
                 userStmt.setString(4, user.getAddress());
                 userStmt.setString(5, user.getPhone());
                 userStmt.setString(6, user.getEmail());
-                userStmt.setString(7, user.getPassword()); // In a real app, hash this!
+                String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+                userStmt.setString(7, hashedPassword);
                 userStmt.setString(8, user.getProfileImage());
 
                 int affectedRows = userStmt.executeUpdate();

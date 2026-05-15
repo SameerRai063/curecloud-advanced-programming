@@ -1,5 +1,19 @@
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%
+    String userName    = (session.getAttribute("userName") != null) ? (String) session.getAttribute("userName") : "Admin";
+    String userRole    = (session.getAttribute("userRole") != null) ? (String) session.getAttribute("userRole") : "Super Admin";
+    String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy"));
+
+    int    totalDoctors       = (request.getAttribute("totalDoctors")       != null) ? (Integer) request.getAttribute("totalDoctors")       : 0;
+    int    totalPatients      = (request.getAttribute("totalPatients")      != null) ? (Integer) request.getAttribute("totalPatients")      : 0;
+    int    totalReceptionists = (request.getAttribute("totalReceptionists") != null) ? (Integer) request.getAttribute("totalReceptionists") : 0;
+    double totalRevenue       = (request.getAttribute("totalRevenue")       != null) ? (Double)  request.getAttribute("totalRevenue")       : 0.0;
+
+    String errorMessage = (String) request.getAttribute("errorMessage");
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -368,7 +382,7 @@
         <div class="topbar-left">
             <span class="title">Patients</span>
             <span class="divider">|</span>
-            <span class="date">May 1, 2026</span>
+            <span class="date"><%= currentDate %></span>
         </div>
         <div class="topbar-center">
             <form action="searchPatients.jsp" method="GET" class="top-search">

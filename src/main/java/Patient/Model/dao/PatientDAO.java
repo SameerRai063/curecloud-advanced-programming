@@ -2,7 +2,11 @@ package Patient.Model.dao;
 
 import Patient.Model.Patient;
 import User.Model.User;
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +39,9 @@ public class PatientDAO implements PatientInterface {
                 userStmt.setString(4, user.getAddress());
                 userStmt.setString(5, user.getPhone());
                 userStmt.setString(6, user.getEmail());
-                userStmt.setString(7, user.getPassword());
+                String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+
+                userStmt.setString(7, hashedPassword);
                 userStmt.setString(8, user.getProfileImage());
 
                 int affectedRows = userStmt.executeUpdate();
@@ -173,7 +179,9 @@ public class PatientDAO implements PatientInterface {
                 ps.setString(4, user.getAddress());
                 ps.setString(5, user.getPhone());
                 ps.setString(6, user.getEmail());
-                ps.setString(7, user.getPassword());
+                String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+
+                ps.setString(7, hashedPassword);
                 ps.setString(8, user.getProfileImage());
                 ps.setString(9, user.getRole());
                 ps.executeUpdate();

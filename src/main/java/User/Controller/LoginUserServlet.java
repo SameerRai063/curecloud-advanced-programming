@@ -52,7 +52,7 @@ public class LoginUserServlet extends HttpServlet {
                     String role = user.getRole();
 
                     if ("patient".equalsIgnoreCase(role)) {
-                        response.sendRedirect(ctx + "/Admin-dashboard");
+                        response.sendRedirect(ctx + "/patient/dashboard.jsp");
 
                     } else if ("admin".equalsIgnoreCase(role)) {
                         response.sendRedirect(ctx + "/Admin-dashboard");

@@ -332,79 +332,117 @@
                     Book New Appointment
                 </button>
             </div>
-
             <div class="space-y-4">
 
-                <%-- Appointment: Upcoming --%>
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6 transition-all hover:shadow-md">
-                    <div class="flex items-center gap-5 w-full md:w-auto">
-                        <div class="w-14 h-14 rounded-full bg-blue-50 text-primary-container flex items-center justify-center">
-                            <span class="material-symbols-outlined text-[28px]">schedule</span>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg text-slate-900">Dr. Sarah Jenkins</h3>
-                            <p class="text-sm text-slate-500 font-medium">Cardiac Surgeon</p>
-                            <div class="text-sm text-slate-600 flex items-center gap-2 mt-2 font-medium bg-slate-50 px-3 py-1.5 rounded-lg w-fit">
-                                <span class="material-symbols-outlined text-[16px] text-slate-400">calendar_today</span> Oct 26, 2023
-                                <span class="text-slate-300">|</span>
-                                <span class="material-symbols-outlined text-[16px] text-slate-400">schedule</span> 02:30 PM
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 w-full md:w-auto justify-end">
-                        <span class="px-3 py-1.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-md uppercase tracking-wider">Upcoming</span>
-                    </div>
-                </div>
+                <c:choose>
 
-                <%-- Appointment: Completed --%>
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6 transition-all hover:shadow-md">
-                    <div class="flex items-center gap-5 w-full md:w-auto">
-                        <div class="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-[28px]">check_circle</span>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg text-slate-900">Dr. Arjun Mehta</h3>
-                            <p class="text-sm text-slate-500 font-medium">Cardiology Specialist Center</p>
-                            <div class="text-sm text-slate-600 flex items-center gap-2 mt-2 font-medium bg-slate-50 px-3 py-1.5 rounded-lg w-fit">
-                                <span class="material-symbols-outlined text-[16px] text-slate-400">calendar_today</span> Oct 10, 2023
-                                <span class="text-slate-300">|</span>
-                                <span class="material-symbols-outlined text-[16px] text-slate-400">schedule</span> 10:00 AM
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 w-full md:w-auto justify-end">
-                        <span class="px-3 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-md uppercase tracking-wider">Completed</span>
-                        <button onclick="openReviewModal('Dr. Arjun Mehta')"
-                            class="px-4 py-2 border border-primary-container text-primary-container rounded-lg hover:bg-primary-container/10 transition-colors text-sm font-bold flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[18px]">rate_review</span> Review
-                        </button>
-                    </div>
-                </div>
+                    <c:when test="${not empty appointments}">
 
-                <%-- Appointment: Completed with Review --%>
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6 transition-all hover:shadow-md">
-                    <div class="flex items-center gap-5 w-full md:w-auto">
-                        <div class="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-[28px]">check_circle</span>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg text-slate-900">Dr. Anjali Sharma</h3>
-                            <p class="text-sm text-slate-500 font-medium">General Internal Medicine</p>
-                            <div class="text-sm text-slate-600 flex items-center gap-2 mt-2 font-medium bg-slate-50 px-3 py-1.5 rounded-lg w-fit">
-                                <span class="material-symbols-outlined text-[16px] text-slate-400">calendar_today</span> Sep 15, 2023
-                                <span class="text-slate-300">|</span>
-                                <span class="material-symbols-outlined text-[16px] text-slate-400">schedule</span> 01:15 PM
+                        <c:forEach var="appointment" items="${appointments}">
+
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6 transition-all hover:shadow-md">
+
+                                    <%-- Left Side --%>
+                                <div class="flex items-center gap-5 w-full md:w-auto">
+
+                                        <%-- Status Icon --%>
+                                    <div class="w-14 h-14 rounded-full
+                            ${appointment.status == 'completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-primary-container'}
+                            flex items-center justify-center">
+
+                            <span class="material-symbols-outlined text-[28px]">
+                                    ${appointment.status == 'completed' ? 'check_circle' : 'schedule'}
+                            </span>
+                                    </div>
+
+                                        <%-- Appointment Info --%>
+                                    <div>
+
+                                        <h3 class="font-bold text-lg text-slate-900">
+                                                ${appointment.doctorName}
+                                        </h3>
+
+                                        <p class="text-sm text-slate-500 font-medium">
+                                                ${appointment.department}
+                                        </p>
+
+                                        <div class="text-sm text-slate-600 flex items-center gap-2 mt-2 font-medium bg-slate-50 px-3 py-1.5 rounded-lg w-fit">
+
+                                <span class="material-symbols-outlined text-[16px] text-slate-400">
+                                    calendar_today
+                                </span>
+
+                                                ${appointment.appointmentDate}
+
+                                        </div>
+
+                                        <div class="mt-2 text-sm text-slate-500">
+                                            Reason: ${appointment.reason}
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                    <%-- Right Side --%>
+                                <div class="flex items-center gap-4 w-full md:w-auto justify-end">
+
+                                        <%-- Status Badge --%>
+                                    <span class="px-3 py-1.5
+                            ${appointment.status == 'completed'
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : 'bg-blue-100 text-blue-700'}
+                            text-xs font-bold rounded-md uppercase tracking-wider">
+
+                                            ${appointment.status}
+
+                                    </span>
+
+                                        <%-- Review Button for Completed Appointments --%>
+                                    <c:if test="${appointment.status == 'completed'}">
+
+                                        <button
+                                                onclick="openReviewModal('${appointment.doctorName}')"
+                                                class="px-4 py-2 border border-primary-container text-primary-container rounded-lg hover:bg-primary-container/10 transition-colors text-sm font-bold flex items-center gap-2">
+
+                                <span class="material-symbols-outlined text-[18px]">
+                                    rate_review
+                                </span>
+
+                                            Review
+                                        </button>
+
+                                    </c:if>
+
+                                </div>
+
                             </div>
+
+                        </c:forEach>
+
+                    </c:when>
+
+                    <%-- No Appointments --%>
+                    <c:otherwise>
+
+                        <div class="bg-white rounded-xl p-10 text-center border border-slate-200 shadow-sm">
+
+                <span class="material-symbols-outlined text-[60px] text-slate-300 mb-4">
+                    event_busy
+                </span>
+
+                            <h3 class="text-xl font-bold text-slate-700 mb-2">
+                                No Appointments Found
+                            </h3>
+
+                            <p class="text-slate-500">
+                                You have not booked any appointments yet.
+                            </p>
+
                         </div>
-                    </div>
-                    <div class="flex items-center gap-4 w-full md:w-auto justify-end">
-                        <span class="px-3 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-md uppercase tracking-wider">Completed</span>
-                        <button onclick="openReviewModal('Dr. Anjali Sharma')"
-                            class="px-4 py-2 border border-primary-container text-primary-container rounded-lg hover:bg-primary-container/10 transition-colors text-sm font-bold flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[18px]">rate_review</span> Review
-                        </button>
-                    </div>
-                </div>
+
+                    </c:otherwise>
+
+                </c:choose>
 
             </div>
         </div>
