@@ -85,4 +85,14 @@ public class UserDAO implements UserInterface {
 
         return ps.executeUpdate() > 0;
     }
+    @Override
+    public boolean isEmailExists(String email) throws SQLException {
+        String query = "SELECT id FROM users WHERE email = ?";
+        try (PreparedStatement stmt = con.prepareStatement(query)) {
+            stmt.setString(1, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next(); // Returns true if a record is found
+            }
+        }
+    }
 }

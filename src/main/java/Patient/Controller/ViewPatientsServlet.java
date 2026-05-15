@@ -29,6 +29,7 @@ public class ViewPatientsServlet extends HttpServlet {
 
             // 4. Send to JSP
             request.setAttribute("patientList", patients);
+            request.setAttribute("currentDate", java.time.LocalDate.now());
             request.getRequestDispatcher("/admin/patients.jsp").forward(request, response);
 
         } catch (Exception e) {

@@ -7,6 +7,7 @@ public class Appointment {
 
     private int id;
     private int patientId;
+    private String patientName;
     private int doctorId;
     private String doctorName; // <-- Added field
     private String department;
@@ -15,7 +16,7 @@ public class Appointment {
     private String status; // scheduled, completed
     private Timestamp createdAt;
     private Timestamp updatedAt;
-
+    private java.sql.Time appointmentTime;
     // Constructor
     public Appointment() {}
 
@@ -62,4 +63,14 @@ public class Appointment {
 
     public Timestamp getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getPatientName() { return patientName; }
+    public void setPatientName(String patientName) { this.patientName = patientName; }
+    public java.sql.Time getAppointmentTime() {
+        return appointmentTime;
+    }
+
+    public void setAppointmentTime(java.sql.Time appointmentTime) {
+        this.appointmentTime = appointmentTime;
+    }
 }

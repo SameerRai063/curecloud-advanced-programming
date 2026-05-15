@@ -2,10 +2,8 @@ package Receptionist.Model.dao;
 
 import Receptionist.Model.Receptionist;
 import User.Model.User;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import org.mindrot.jbcrypt.BCrypt;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,13 +15,98 @@ public class ReceptionistDAO implements ReceptionistInterface {
         this.con = con;
     }
 
+    @Override
+    public Receptionist getReceptionistById(int userId) throws Exception {
+        String sql = "SELECT u.id, u.name, u.gender, u.dob, u.address, u.phone, u.email, " +
+                "u.profile_image, u.role, u.created_at, u.updated_at, " +
+                "r.status " +
+                "FROM users u INNER JOIN receptionist r ON u.id = r.user_id " +
+                "WHERE u.id = ?";
 
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setName(rs.getString("name"));
+                    user.setGender(rs.getString("gender"));
+                    user.setDob(rs.getDate("dob"));
+                    user.setAddress(rs.getString("address"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setEmail(rs.getString("email"));
+                    user.setProfileImage(rs.getString("profile_image"));
+                    user.setRole(rs.getString("role"));
+                    user.setCreatedAt(rs.getTimestamp("created_at"));
+                    user.setUpdatedAt(rs.getTimestamp("updated_at"));
+
+                    Receptionist receptionist = new Receptionist();
+                    receptionist.setUserId(rs.getInt("id"));
+                    receptionist.setStatus(rs.getString("status"));
+                    receptionist.setUser(user);
+
+                    return receptionist;
+                }
+            }
+        }
+        return null;
+    }
 @Override
-public boolean addReceptionist(Receptionist receptionist) throws Exception{
-    String sql = "DELETE FROM receptionist WHERE user_id=?";
-    PreparedStatement ps = con.prepareStatement(sql);
-    ps.setInt(1, receptionist.getUserId());
-    return ps.executeUpdate() > 0;
+public boolean addReceptionist(Receptionist receptionist) throws Exception {
+    User user = receptionist.getUser();
+    if (user == null) return false;
+
+    String userQuery = "INSERT INTO users (name, gender, dob, address, phone, email, password, role, profile_image) VALUES (?, ?, ?, ?, ?, ?, ?, 'receptionist', ?)";
+    String recQuery = "INSERT INTO receptionist (user_id, status) VALUES (?, ?)";
+
+    boolean originalAutoCommit = con.getAutoCommit();
+
+    try {
+        con.setAutoCommit(false); // Start Transaction
+
+        // 1. Insert into Users Table
+        int generatedUserId = -1;
+        try (PreparedStatement userStmt = con.prepareStatement(userQuery, Statement.RETURN_GENERATED_KEYS)) {
+            userStmt.setString(1, user.getName());
+            userStmt.setString(2, user.getGender());
+            userStmt.setDate(3, user.getDob());
+            userStmt.setString(4, user.getAddress());
+            userStmt.setString(5, user.getPhone());
+            userStmt.setString(6, user.getEmail());
+            String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+            userStmt.setString(7, hashedPassword);
+            userStmt.setString(8, user.getProfileImage());
+
+            int affectedRows = userStmt.executeUpdate();
+            if (affectedRows == 0) throw new SQLException("Creating user failed, no rows affected.");
+
+            try (ResultSet generatedKeys = userStmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    generatedUserId = generatedKeys.getInt(1);
+                } else {
+                    throw new SQLException("Creating user failed, no ID obtained.");
+                }
+            }
+        }
+
+        // 2. Insert into Receptionists Table
+        try (PreparedStatement recStmt = con.prepareStatement(recQuery)) {
+            recStmt.setInt(1, generatedUserId);
+            recStmt.setString(2, receptionist.getStatus());
+
+            recStmt.executeUpdate();
+        }
+
+        con.commit(); // Success: Commit both queries
+        return true;
+
+    } catch (Exception e) {
+        con.rollback(); // Failure: Undo everything
+        e.printStackTrace();
+        throw e;
+    } finally {
+        con.setAutoCommit(originalAutoCommit);
+    }
 }
     @Override
     public List<Receptionist> getAllReceptionists() throws Exception {
@@ -70,10 +153,49 @@ public boolean addReceptionist(Receptionist receptionist) throws Exception{
     }
     @Override
     public boolean deleteReceptionist(int userId) throws Exception {
-        String sql = "DELETE FROM receptionist WHERE user_id=?";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, userId);
-        return ps.executeUpdate() > 0;
+        // Delete from receptionist first (child), then users (parent) to respect FK constraint
+        String deleteReceptionistSQL = "DELETE FROM receptionist WHERE user_id = ?";
+        String deleteUserSQL         = "DELETE FROM users WHERE id = ?";
+
+        boolean originalAutoCommit = con.getAutoCommit();
+
+        try {
+            con.setAutoCommit(false); // start transaction
+
+            // Step 1: delete from receptionist table
+            try (PreparedStatement psReceptionist = con.prepareStatement(deleteReceptionistSQL)) {
+                psReceptionist.setInt(1, userId);
+                int rows = psReceptionist.executeUpdate();
+                if (rows == 0) {
+                    con.rollback();
+                    return false; // no receptionist found with that ID
+                }
+            }
+
+            // Step 2: delete from users table
+            try (PreparedStatement psUser = con.prepareStatement(deleteUserSQL)) {
+                psUser.setInt(1, userId);
+                int rows = psUser.executeUpdate();
+                if (rows == 0) {
+                    con.rollback();
+                    return false; // user row not found
+                }
+            }
+
+            con.commit(); // both deletes succeeded
+            return true;
+
+        } catch (Exception e) {
+            if (con != null) {
+                con.rollback();
+            }
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (con != null) {
+                con.setAutoCommit(originalAutoCommit);
+            }
+        }
     }
     @Override
     public boolean updateReceptionistProfile(Receptionist receptionist, String currentPassword, String newPassword) throws Exception {

@@ -31,40 +31,49 @@ public class LoginUserServlet extends HttpServlet {
             // 1. Fetch the user from the database by email
             User user = userDAO.getUserByEmail(email);
 
-            // 2. Check if user exists AND password matches
-            if (user != null && BCrypt.checkpw(plainPassword, user.getPassword())) {
+            // 2. Check if user exists
+            if (user != null) {
 
-                // Login successful — create session
-                HttpSession session = request.getSession();
-                session.setAttribute("loggedInUser", user);
+                // Normalize $2y$ / $2b$ prefixes to $2a$ (jBCrypt only understands $2a$)
+                String storedHash = user.getPassword();
+                if (storedHash != null && (storedHash.startsWith("$2y$") || storedHash.startsWith("$2b$"))) {
+                    storedHash = "$2a$" + storedHash.substring(4);
+                }
 
-                // FIX: store name and role so JSP sidebar can display them
-                session.setAttribute("userName", user.getName());
-                session.setAttribute("userRole", user.getRole());
+                // 3. Verify password
+                if (BCrypt.checkpw(plainPassword, storedHash)) {
 
-                // FIX: redirect through /dashboard servlet (not directly to JSP)
-                //      so dashboard stats are fetched before the page renders
-                String role = user.getRole();
+                    // Login successful — create session
+                    HttpSession session = request.getSession();
+                    session.setAttribute("loggedInUser", user);
+                    session.setAttribute("userName", user.getName());
+                    session.setAttribute("userRole", user.getRole());
 
-                if ("patient".equalsIgnoreCase(role)) {
-                    response.sendRedirect(ctx + "/Admin-dashboard");
+                    String role = user.getRole();
 
-                } else if ("admin".equalsIgnoreCase(role)) {
-                    response.sendRedirect(ctx + "/Admin-dashboard");
+                    if ("patient".equalsIgnoreCase(role)) {
+                        response.sendRedirect(ctx + "/patient/dashboard.jsp");
 
-                } else if ("doctor".equalsIgnoreCase(role)) {
-                    response.sendRedirect(ctx + "/Admin-dashboard");
+                    } else if ("admin".equalsIgnoreCase(role)) {
+                        response.sendRedirect(ctx + "/Admin-dashboard");
 
-                } else if ("receptionist".equalsIgnoreCase(role)) {
-                    response.sendRedirect(ctx + "/Admin-dashboard");
+                    } else if ("doctor".equalsIgnoreCase(role)) {
+                        response.sendRedirect(ctx + "/Admin-dashboard");
+
+                    } else if ("receptionist".equalsIgnoreCase(role)) {
+                        response.sendRedirect(ctx + "/Admin-dashboard");
+
+                    } else {
+                        response.sendRedirect(ctx + "/login.jsp");
+                    }
 
                 } else {
-                    // Fallback for unknown roles
-                    response.sendRedirect(ctx + "/login.jsp");
+                    // Wrong password
+                    response.sendRedirect(ctx + "/login.jsp?error=invalid_credentials");
                 }
 
             } else {
-                // Login failed — wrong email or password
+                // No user found with that email
                 response.sendRedirect(ctx + "/login.jsp?error=invalid_credentials");
             }
 

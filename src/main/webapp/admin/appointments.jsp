@@ -14,7 +14,38 @@
     :root { --primary-blue: #2554ff; --primary-teal: #0d7f6b; --bg-light: #f8fafc; --text-dark: #111827; --text-gray: #6b7280; --border-color: #e5e7eb; --sidebar-text-muted: #a0bafc; --table-header-bg: #e2f1ec; --table-header-text: #0b6b59; }
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     body { background-color: var(--bg-light); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
+    .btn-view {
+      display: inline-block;
+      padding: 6px 14px;
+      background-color: #2554ff;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-right: 8px;
+      transition: 0.2s ease;
+    }
 
+    .btn-view:hover {
+      background-color: #1d46d8;
+    }
+
+    .btn-delete {
+      display: inline-block;
+      padding: 6px 14px;
+      background-color: #dc2626;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .btn-delete:hover {
+      background-color: #b91c1c;
+    }
     .sidebar { width: 250px; background-color: var(--primary-blue); color: white; display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; }
     .sidebar-top { padding: 24px 16px; }
     .brand h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
@@ -42,17 +73,11 @@
     .page-header h2 { font-size: 24px; font-weight: 700; color: #1a202c; }
     .page-header p { font-size: 14px; color: var(--text-gray); margin-top: 4px; }
 
-    /* Stats Grid - Updated to 3 Columns */
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
     .stat-card { background-color: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
     .stat-info h3 { font-size: 12px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; margin-bottom: 12px; }
     .stat-info .value { font-size: 28px; font-weight: 700; color: #111827; }
-
-    /* Filters Row */
-    .filters-row { display: flex; gap: 16px; margin-bottom: 24px; align-items: center; }
-    .filter-dropdown { flex: 1; padding: 10px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; font-size: 13px; color: var(--text-dark); display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
-    .filter-dropdown i { color: var(--text-gray); }
-    .btn-refresh { background-color: var(--primary-teal); color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; gap: 8px; align-items: center; }
 
     /* Table */
     .table-container { background-color: white; border: 1px solid var(--border-color); border-radius: 12px; overflow:hidden;}
@@ -64,7 +89,7 @@
     /* Floating Action Button */
     .fab { position: absolute; bottom: 40px; right: 40px; width: 56px; height: 56px; background-color: var(--primary-teal); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; box-shadow: 0 4px 12px rgba(13, 127, 107, 0.3); cursor: pointer; border: none; }
 
-    /* Action Icons for Table */
+    /* Action Icons */
     .action-icon { margin-right: 12px; font-size: 16px; cursor: pointer; color: var(--text-gray); }
     .action-icon:hover { color: var(--primary-teal); }
   </style>
@@ -74,12 +99,24 @@
   <div class="sidebar-top">
     <div class="brand"><h1>Upachaar</h1><p>Clinical Oversight</p></div>
     <ul class="nav-menu">
-      <li class="nav-item"><a href="dashboard.jsp" class="nav-link"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
-      <li class="nav-item"><a href="doctors.jsp" class="nav-link"><i class="fa-solid fa-stethoscope"></i> Doctors</a></li>
-      <li class="nav-item"><a href="patients.jsp" class="nav-link"><i class="fa-solid fa-users"></i> Patients</a></li>
-      <li class="nav-item"><a href="receptionists.jsp" class="nav-link"><i class="fa-solid fa-user-nurse"></i> Receptionists</a></li>
-      <li class="nav-item active"><a href="appointments.jsp" class="nav-link"><i class="fa-regular fa-calendar"></i> Appointments</a></li>
-      <li class="nav-item"><a href="billing.jsp" class="nav-link"><i class="fa-solid fa-file-invoice-dollar"></i> Billing</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/Admin-dashboard" class="nav-link">
+          <i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/doctors" class="nav-link">
+          <i class="fa-solid fa-stethoscope"></i> Doctors</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/patients" class="nav-link">
+          <i class="fa-solid fa-users"></i> Patients</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/receptionists" class="nav-link">
+          <i class="fa-solid fa-user-nurse"></i> Receptionists</a></li>
+      <li class="nav-item active">
+        <a href="${pageContext.request.contextPath}/appointments" class="nav-link">
+          <i class="fa-regular fa-calendar"></i> Appointments</a></li>
+      <li class="nav-item">
+        <a href="billing.jsp" class="nav-link">
+          <i class="fa-solid fa-file-invoice-dollar"></i> Billing</a></li>
     </ul>
   </div>
   <div class="user-profile">
@@ -98,12 +135,9 @@
       <span class="date">${not empty currentDate ? currentDate : 'May 1, 2026'}</span>
     </div>
 
-    <form action="searchAppointments.jsp" method="GET" class="top-search">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" name="query" placeholder="Search patients, records, or doctors...">
-    </form>
-
-    <div class="topbar-right"><button class="btn-support">Support</button></div>
+    <div class="topbar-right">
+      <button class="btn-support">Support</button>
+    </div>
   </header>
 
   <main class="content">
@@ -113,7 +147,7 @@
     </div>
 
     <div class="stats-grid">
-      <div class="stat-card" style="background: #f8fafc;">
+      <div class="stat-card">
         <div class="stat-info">
           <h3>TOTAL APPOINTMENTS</h3>
           <div class="value">${not empty totalAppointments ? totalAppointments : 0}</div>
@@ -133,13 +167,6 @@
       </div>
     </div>
 
-    <div class="filters-row">
-      <div class="filter-dropdown"><i class="fa-regular fa-calendar"></i> <span style="flex:1; margin-left:8px;">All Dates</span> <i class="fa-solid fa-chevron-down"></i></div>
-      <div class="filter-dropdown"><i class="fa-regular fa-building"></i> <span style="flex:1; margin-left:8px;">All Departments</span> <i class="fa-solid fa-chevron-down"></i></div>
-      <div class="filter-dropdown"><i class="fa-regular fa-flag"></i> <span style="flex:1; margin-left:8px;">All Status</span> <i class="fa-solid fa-chevron-down"></i></div>
-      <button class="btn-refresh" onclick="location.reload();"><i class="fa-solid fa-arrow-rotate-right"></i> Refresh</button>
-    </div>
-
     <div class="table-container">
       <table class="data-table">
         <thead>
@@ -157,7 +184,7 @@
         <c:choose>
           <c:when test="${empty appointmentList}">
             <tr>
-              <td colspan="7" class="empty-state">Showing 0 records</td>
+              <td colspan="7" class="empty-state">No appointments found</td>
             </tr>
           </c:when>
           <c:otherwise>
@@ -167,11 +194,30 @@
                 <td>${appointment.patientName}</td>
                 <td>${appointment.doctorName}</td>
                 <td>${appointment.department}</td>
-                <td>${appointment.dateTime}</td>
+                <td>${appointment.appointmentDate}</td>
                 <td>${appointment.status}</td>
                 <td>
-                  <a href="viewAppointment.jsp?id=${appointment.id}" class="action-icon"><i class="fa-solid fa-eye"></i></a>
-                  <a href="editAppointment.jsp?id=${appointment.id}" class="action-icon"><i class="fa-solid fa-pen"></i></a>
+                  <button
+                          type="button"
+                          class="btn-view"
+                          onclick="openAppointmentModal(
+                                  '${appointment.id}',
+                                  '${appointment.patientName}',
+                                  '${appointment.doctorName}',
+                                  '${appointment.department}',
+                                  '${appointment.appointmentDate}',
+                                  '${appointment.appointmentTime}',
+                                  '${appointment.status}',
+                                  '${appointment.reason}'
+                                  )">
+                    View
+                  </button>
+
+                  <a href="${pageContext.request.contextPath}/deleteAppointment?id=${appointment.id}"
+                     class="btn-delete"
+                     onclick="return confirm('Are you sure you want to delete appointment ID ${appointment.id}? This action cannot be undone.');">
+                    Delete
+                  </a>
                 </td>
               </tr>
             </c:forEach>
@@ -184,5 +230,126 @@
     <button class="fab" onclick="window.location.href='addAppointment.jsp'"><i class="fa-solid fa-plus"></i></button>
   </main>
 </div>
+<!-- VIEW APPOINTMENT MODAL -->
+<div id="appointmentModal"
+     style="display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.5);
+            z-index:9999;
+            justify-content:center;
+            align-items:center;">
+
+  <div style="
+        background:white;
+        width:500px;
+        max-width:90%;
+        border-radius:12px;
+        padding:30px;
+        position:relative;
+        box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    ">
+
+    <button onclick="closeAppointmentModal()"
+            style="
+                    position:absolute;
+                    top:15px;
+                    right:15px;
+                    border:none;
+                    background:none;
+                    font-size:20px;
+                    cursor:pointer;
+                ">
+      ×
+    </button>
+
+    <h2 style="margin-bottom:20px;color:#2554ff;">
+      Appointment Details
+    </h2>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+
+      <div>
+        <strong>ID:</strong>
+        <span id="modalAppointmentId"></span>
+      </div>
+
+      <div>
+        <strong>Patient:</strong>
+        <span id="modalPatientName"></span>
+      </div>
+
+      <div>
+        <strong>Doctor:</strong>
+        <span id="modalDoctorName"></span>
+      </div>
+
+      <div>
+        <strong>Department:</strong>
+        <span id="modalDepartment"></span>
+      </div>
+
+      <div>
+        <strong>Date:</strong>
+        <span id="modalDate"></span>
+      </div>
+
+      <div>
+        <strong>Time:</strong>
+        <span id="modalTime"></span>
+      </div>
+
+      <div>
+        <strong>Status:</strong>
+        <span id="modalStatus"></span>
+      </div>
+
+      <div>
+        <strong>Reason:</strong>
+        <span id="modalReason"></span>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script>
+  function openAppointmentModal(
+          id,
+          patient,
+          doctor,
+          department,
+          date,
+          time,
+          status,
+          reason
+  ) {
+
+    document.getElementById("modalAppointmentId").innerText = id;
+    document.getElementById("modalPatientName").innerText = patient;
+    document.getElementById("modalDoctorName").innerText = doctor;
+    document.getElementById("modalDepartment").innerText = department;
+    document.getElementById("modalDate").innerText = date;
+    document.getElementById("modalTime").innerText = time;
+    document.getElementById("modalStatus").innerText = status;
+    document.getElementById("modalReason").innerText = reason;
+
+    document.getElementById("appointmentModal").style.display = "flex";
+  }
+
+  function closeAppointmentModal() {
+    document.getElementById("appointmentModal").style.display = "none";
+  }
+
+  window.onclick = function(event) {
+    const modal = document.getElementById("appointmentModal");
+
+    if (event.target === modal) {
+      closeAppointmentModal();
+    }
+  }
+</script>
 </body>
 </html>

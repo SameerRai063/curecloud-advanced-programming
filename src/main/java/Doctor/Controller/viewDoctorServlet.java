@@ -1,5 +1,6 @@
 package Doctor.Controller;
 
+import Doctor.Model.Doctor;
 import Doctor.Model.dao.DoctorDAO;
 import utils.DBConnection;
 
@@ -12,8 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
 
-@WebServlet("/deleteDoctor")
-public class deleteDoctorServlet extends HttpServlet {
+@WebServlet("/viewDoctor")
+public class viewDoctorServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -33,14 +34,15 @@ public class deleteDoctorServlet extends HttpServlet {
             // 2. Initialize DAO
             DoctorDAO doctorDAO = new DoctorDAO(con);
 
-            // 3. Perform the transaction-safe deletion
-            boolean isDeleted = doctorDAO.deleteDoctor(userId);
+            // 3. Fetch the doctor details
+            Doctor doctor = doctorDAO.getDoctorById(userId);
 
-            if (isDeleted) {
-                // 4. Redirect back with success message
-                response.sendRedirect(request.getContextPath() + "/doctors?success=deleted");
+            if (doctor != null) {
+                // 4. Set doctor object in request and forward to the view page
+                request.setAttribute("doctor", doctor);
+                request.getRequestDispatcher("/viewDoctor.jsp").forward(request, response);
             } else {
-                // Case where the ID wasn't found in the database
+                // Doctor not found in the database
                 response.sendRedirect(request.getContextPath() + "/doctors?error=not_found");
             }
 
@@ -48,8 +50,7 @@ public class deleteDoctorServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/doctors?error=invalid_id");
         } catch (Exception e) {
             e.printStackTrace();
-            // Handle DB errors or foreign key violations
-            response.sendRedirect(request.getContextPath() + "/doctors?error=delete_failed");
+            response.sendRedirect(request.getContextPath() + "/doctors?error=db_error");
         }
     }
 }
