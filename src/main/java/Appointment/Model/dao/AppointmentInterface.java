@@ -6,7 +6,7 @@ import java.util.List;
 public interface AppointmentInterface {
 
     // Create
-    boolean addAppointment(Appointment appointment) throws Exception;
+    public int addAppointment(Appointment appointment) throws Exception;
 
     // Read
     List<Appointment> getAllAppointments() throws Exception;

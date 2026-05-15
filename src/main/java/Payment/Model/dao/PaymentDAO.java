@@ -4,6 +4,7 @@ import Payment.Model.Payment;
 import java.util.List;
 import Patient.Model.Patient;
 import User.Model.User;
+import utils.DBConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -73,5 +74,21 @@ public class PaymentDAO implements PaymentInterface {
         }
 
         return paymentList;
+    }
+    @Override
+    public boolean addPayment(Payment payment) throws Exception {
+
+        String sql = "INSERT INTO payments (patient_id, appointment_id, amount) " +
+                "VALUES (?, ?, ?)";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, payment.getPatientId());
+            ps.setInt(2, payment.getAppointmentId());
+            ps.setBigDecimal(3, payment.getAmount());
+
+            return ps.executeUpdate() > 0;
+        }
     }
 }

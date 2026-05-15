@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.mindrot.jbcrypt.BCrypt;
+import utils.DBConnection;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,13 @@ public class PatientDAO implements PatientInterface {
     public PatientDAO(Connection con) {
         this.con = con;
     }
-
+    public PatientDAO() {
+        try {
+            this.con = DBConnection.getConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public boolean addPatient(Patient patient) throws Exception {
         User user = patient.getUser();
         if (user == null) return false;
@@ -275,19 +283,23 @@ public class PatientDAO implements PatientInterface {
             return false;
         }
 
-        String checkAuthQuery   = "SELECT password FROM users WHERE id = ?";
-        String updateUserQuery  = "UPDATE users SET name = ?, email = ?, phone = ?, address = ?, password = ? WHERE id = ?";
+        String checkAuthQuery     = "SELECT password FROM users WHERE id = ?";
+        String updateUserQuery    = "UPDATE users SET name = ?, email = ?, phone = ?, gender = ?, address = ?, password = ? WHERE id = ?";
         String updatePatientQuery = "UPDATE patient SET blood_group = ? WHERE user_id = ?";
 
         boolean originalAutoCommit = con.getAutoCommit();
 
         try {
+            String dbPassword;
+
+            // Step 1: Verify current password
             try (PreparedStatement checkStmt = con.prepareStatement(checkAuthQuery)) {
                 checkStmt.setInt(1, patient.getUserId());
                 try (ResultSet rs = checkStmt.executeQuery()) {
                     if (rs.next()) {
-                        String dbPassword = rs.getString("password");
-                        if (!dbPassword.equals(currentPassword)) {
+                        dbPassword = rs.getString("password");
+
+                        if (!BCrypt.checkpw(currentPassword, dbPassword)) {
                             System.err.println("Update Failed: Current password does not match.");
                             return false;
                         }
@@ -299,17 +311,20 @@ public class PatientDAO implements PatientInterface {
 
             con.setAutoCommit(false);
 
+            // Step 2: Decide password to save
             String passwordToSave = (newPassword != null && !newPassword.trim().isEmpty())
-                    ? newPassword
-                    : currentPassword;
+                    ? BCrypt.hashpw(newPassword, BCrypt.gensalt())
+                    : dbPassword;
 
+            // Step 3: Update users table
             try (PreparedStatement userStmt = con.prepareStatement(updateUserQuery)) {
                 userStmt.setString(1, patient.getUser().getName());
                 userStmt.setString(2, patient.getUser().getEmail());
                 userStmt.setString(3, patient.getUser().getPhone());
-                userStmt.setString(4, patient.getUser().getAddress());
-                userStmt.setString(5, passwordToSave);
-                userStmt.setInt(6, patient.getUserId());
+                userStmt.setString(4, patient.getUser().getGender()); // ← added
+                userStmt.setString(5, patient.getUser().getAddress());
+                userStmt.setString(6, passwordToSave);
+                userStmt.setInt(7, patient.getUserId());              // ← shifted to 7
 
                 int userRowsAffected = userStmt.executeUpdate();
                 if (userRowsAffected == 0) {
@@ -318,6 +333,7 @@ public class PatientDAO implements PatientInterface {
                 }
             }
 
+            // Step 4: Update patient table
             try (PreparedStatement patientStmt = con.prepareStatement(updatePatientQuery)) {
                 patientStmt.setString(1, patient.getBloodGroup());
                 patientStmt.setInt(2, patient.getUserId());

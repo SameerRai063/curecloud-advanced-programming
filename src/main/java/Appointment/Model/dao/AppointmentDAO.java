@@ -37,24 +37,31 @@ public class AppointmentDAO implements AppointmentInterface {
     // ADD APPOINTMENT
     // =========================
     @Override
-    public boolean addAppointment(Appointment appointment) throws Exception {
+    public int addAppointment(Appointment appointment) throws Exception {
 
-        String sql = "INSERT INTO appointment " +
-                "(patient_id, doctor_id, department, appointment_date, reason, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO appointments " +
+                "(patient_id, doctor_id, department, appointment_date,appointment_time, reason, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?,?)";
 
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, appointment.getPatientId());
             ps.setInt(2, appointment.getDoctorId());
             ps.setString(3, appointment.getDepartment());
             ps.setDate(4, appointment.getAppointmentDate());
-            ps.setString(5, appointment.getReason());
-            ps.setString(6, appointment.getStatus());
+            ps.setTime(5, appointment.getAppointmentTime());
+            ps.setString(6, appointment.getReason());
+            ps.setString(7, appointment.getStatus());
 
-            return ps.executeUpdate() > 0;
+            ps.executeUpdate();
+
+            // Return the generated appointment id
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) return rs.getInt(1);
+            }
         }
+        return -1;
     }
 
     // =========================
@@ -104,7 +111,7 @@ public class AppointmentDAO implements AppointmentInterface {
                         "pUser.name AS patient_name, " +
                         "dUser.name AS doctor_name, " +
                         "d.department " +
-                        "FROM appointment a " +
+                        "FROM appointments a " +
                         "JOIN patient p ON a.patient_id = p.user_id " +
                         "JOIN users pUser ON p.user_id = pUser.id " +
                         "JOIN doctor d ON a.doctor_id = d.user_id " +

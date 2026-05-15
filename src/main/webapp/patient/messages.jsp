@@ -61,7 +61,8 @@
                 <span class="material-symbols-outlined">dashboard</span>
                 <span class="text-sm font-medium">Dashboard</span>
             </a>
-            <a class="text-white/70 hover:text-white mx-4 px-4 py-3 transition-all duration-200 flex items-center gap-3 hover:bg-white/10 rounded-full" href="history.jsp">
+            <a class="text-white/70 hover:text-white mx-4 px-4 py-3 transition-all duration-200 hover:bg-white/10 rounded-full flex items-center gap-3"
+               href="${pageContext.request.contextPath}/patientAppointments">
                 <span class="material-symbols-outlined">history</span>
                 <span class="text-sm font-medium">Appointments</span>
             </a>
@@ -70,24 +71,14 @@
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat</span>
                 <span class="text-sm font-medium">Messages</span>
             </a>
-            <a class="text-white/70 hover:text-white mx-4 px-4 py-3 transition-all duration-200 flex items-center gap-3 hover:bg-white/10 rounded-full" href="settings.jsp">
+            <a class="text-white/70 hover:text-white mx-4 px-4 py-3 transition-all duration-200 hover:bg-white/10 rounded-full flex items-center gap-3"
+               href="${pageContext.request.contextPath}/patientProfile">
                 <span class="material-symbols-outlined">settings</span>
                 <span class="text-sm font-medium">Settings</span>
             </a>
         </nav>
         <div class="mt-auto p-8 border-t border-white/10">
-            <div class="flex items-center gap-4">
-                <img alt="John Doe Profile"
-                     class="w-12 h-12 rounded-full border-2 border-white/20 object-cover shadow-sm"
-                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV48gJehKcTQaA-tLOSd2OvWvj9d7PRLTCHa9ByLvLYu6KCt-7krRbexpoypL1VkcLJB6DspWvK4oXQJx8S3Q5uiTTehdR_8M-fZHHHxoYnhkIg1NCY-c3QYyaSOHOhq-b9s5HEsTjx-M_Vhu8hJ2IM0tohjD4py_Js6_ZN1AtCFeGUxx2bBfjfI-y8rwgteocwQ__wPViqVts95_wgeVc7s8wad54HoIY2wrxSF6PTiD0iLvnmwqOoV_OHAm2j6DjqvsTxFb3560">
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold text-white truncate">John Doe</p>
-                    <p class="text-xs text-white/60 truncate font-medium uppercase tracking-wider">Patient ID: #PT-9920</p>
-                </div>
-                <a href="logout.jsp" class="text-white/60 hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">logout</span>
-                </a>
-            </div>
+
         </div>
     </aside>
 
