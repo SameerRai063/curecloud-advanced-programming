@@ -6,13 +6,11 @@
     String userRole    = (session.getAttribute("userRole") != null) ? (String) session.getAttribute("userRole") : "Super Admin";
     String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy"));
 
-    // FIX: read real data from AdminDashboardServlet instead of hardcoded mock values
     int    totalDoctors       = (request.getAttribute("totalDoctors")       != null) ? (Integer) request.getAttribute("totalDoctors")       : 0;
     int    totalPatients      = (request.getAttribute("totalPatients")      != null) ? (Integer) request.getAttribute("totalPatients")      : 0;
     int    totalReceptionists = (request.getAttribute("totalReceptionists") != null) ? (Integer) request.getAttribute("totalReceptionists") : 0;
     double totalRevenue       = (request.getAttribute("totalRevenue")       != null) ? (Double)  request.getAttribute("totalRevenue")       : 0.0;
 
-    // Error surfacing — remove after confirming everything works
     String errorMessage = (String) request.getAttribute("errorMessage");
 %>
 <!DOCTYPE html>
@@ -38,275 +36,93 @@
             --sidebar-text-muted: #a0bafc;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
 
-        body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: var(--primary-blue);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            flex-shrink: 0;
-        }
-
+        /* --- Sidebar Styles --- */
+        .sidebar { width: 250px; background-color: var(--primary-blue); color: white; display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; }
         .sidebar-top { padding: 24px 16px; }
-
-        .brand h1 {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-
-        .brand p {
-            font-size: 12px;
-            color: var(--sidebar-text-muted);
-            margin-bottom: 32px;
-        }
-
+        .brand h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .brand p { font-size: 12px; color: var(--sidebar-text-muted); margin-bottom: 32px; }
         .nav-menu { list-style: none; }
-
         .nav-item { margin-bottom: 4px; }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        .nav-link i {
-            width: 20px;
-            margin-right: 12px;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .nav-item.active .nav-link {
-            background-color: white;
-            color: var(--primary-blue);
-        }
-
-        .nav-link:hover:not(.active) {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
+        .nav-link { display: flex; align-items: center; padding: 12px 16px; color: white; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 8px; transition: all 0.2s; }
+        .nav-link i { width: 20px; margin-right: 12px; font-size: 16px; text-align: center; }
+        .nav-item.active .nav-link { background-color: white; color: var(--primary-blue); }
+        .nav-link:hover:not(.active) { background-color: rgba(255, 255, 255, 0.1); }
         .sidebar-bottom { padding: 20px 16px; }
-
-        .social-links {
-            margin-bottom: 24px;
-            padding: 0 8px;
-        }
-
-        .social-links p {
-            font-size: 11px;
-            color: var(--sidebar-text-muted);
-            margin-bottom: 8px;
-        }
-
-        .social-links i {
-            margin-right: 12px;
-            font-size: 14px;
-            cursor: pointer;
-            color: var(--sidebar-text-muted);
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .avatar {
-            width: 36px;
-            height: 36px;
-            background-color: white;
-            color: var(--primary-blue);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            margin-right: 12px;
-            text-transform: uppercase;
-        }
-
+        .social-links { margin-bottom: 24px; padding: 0 8px; }
+        .social-links p { font-size: 11px; color: var(--sidebar-text-muted); margin-bottom: 8px; }
+        .social-links i { margin-right: 12px; font-size: 14px; cursor: pointer; color: var(--sidebar-text-muted); }
+        .user-profile { display: flex; align-items: center; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .avatar { width: 36px; height: 36px; background-color: white; color: var(--primary-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; margin-right: 12px; text-transform: uppercase; }
         .user-info h4 { font-size: 13px; font-weight: 600; }
         .user-info p  { font-size: 11px; color: var(--sidebar-text-muted); }
 
-        .main-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .topbar {
-            height: 64px;
-            background-color: white;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 32px;
-            flex-shrink: 0;
-        }
-
+        /* --- Main Content Styles --- */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { height: 64px; background-color: white; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; flex-shrink: 0; }
         .topbar-left { font-size: 16px; font-weight: 600; color: var(--primary-teal); }
-
         .topbar-right { display: flex; align-items: center; gap: 20px; }
-
         .date { font-size: 13px; color: var(--text-gray); }
-
         .topbar-icons { display: flex; align-items: center; }
-
-        .topbar-icons i {
-            font-size: 18px;
-            color: var(--text-gray);
-            margin-left: 16px;
-            cursor: pointer;
-        }
-
-        .btn-support {
-            background-color: #f0fdf4;
-            color: var(--primary-teal);
-            border: 1px solid #bbf7d0;
-            border-radius: 20px;
-            padding: 6px 16px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            margin-left: 16px;
-        }
-
-        .content {
-            padding: 32px;
-            overflow-y: auto;
-            flex: 1;
-            background-color: #fdfdfd;
-        }
-
+        .topbar-icons i { font-size: 18px; color: var(--text-gray); margin-left: 16px; cursor: pointer; }
+        .btn-support { background-color: #f0fdf4; color: var(--primary-teal); border: 1px solid #bbf7d0; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 500; cursor: pointer; margin-left: 16px; }
+        .content { padding: 32px; overflow-y: auto; flex: 1; background-color: #fdfdfd; }
         .page-header { margin-bottom: 24px; }
-
-        .page-header h2 {
-            font-size: 26px;
-            font-weight: 700;
-            color: #1a202c;
-            margin-bottom: 4px;
-        }
-
+        .page-header h2 { font-size: 26px; font-weight: 700; color: #1a202c; margin-bottom: 4px; }
         .page-header p { font-size: 14px; color: var(--text-gray); }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background-color: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-        }
-
-        .stat-info h3 {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-gray);
-            margin-bottom: 8px;
-        }
-
-        .stat-info .value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background-color: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; display: flex; justify-content: space-between; align-items: flex-start; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .stat-info h3 { font-size: 13px; font-weight: 500; color: var(--text-gray); margin-bottom: 8px; }
+        .stat-info .value { font-size: 28px; font-weight: 700; color: var(--text-dark); }
         .stat-icon { color: var(--primary-teal); font-size: 22px; }
 
-        .card {
-            background-color: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-        }
+        .card { background-color: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; color: #1a202c; }
 
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #1a202c;
-        }
-
-        .quick-actions-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-        }
-
-        .btn-quick-action {
-            background-color: var(--quick-action-teal);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 16px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            display: block;
-        }
-
+        /* --- Quick Actions Buttons --- */
+        .quick-actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .btn-quick-action { background-color: var(--quick-action-teal); color: white; border: none; border-radius: 8px; padding: 16px; font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; display: block; transition: background-color 0.2s; }
         .btn-quick-action:hover { background-color: #16a086; }
 
-        .recent-activity-container {
-            min-height: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-gray);
-            font-size: 14px;
-        }
+        .recent-activity-container { min-height: 150px; display: flex; align-items: center; justify-content: center; color: var(--text-gray); font-size: 14px; }
+        .error-banner { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px 20px; margin-bottom: 20px; font-size: 13px; }
 
-        .error-banner {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fca5a5;
-            border-radius: 8px;
-            padding: 12px 20px;
-            margin-bottom: 20px;
-            font-size: 13px;
+        /* ========================================= */
+        /* MODAL STYLES ADDED HERE                   */
+        /* ========================================= */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);
+            align-items: center; justify-content: center;
         }
+        .modal-content {
+            background-color: white; padding: 24px; border-radius: 8px;
+            width: 400px; max-width: 90%; position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .close-btn {
+            position: absolute; top: 16px; right: 16px; font-size: 20px;
+            cursor: pointer; color: var(--text-gray); transition: color 0.2s;
+        }
+        .close-btn:hover { color: var(--text-dark); }
+        .modal-content h3 { margin-bottom: 16px; color: var(--text-dark); }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: var(--text-dark); }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px; border: 1px solid var(--border-color);
+            border-radius: 6px; font-size: 14px; outline: none;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary-blue); }
+        .btn-submit {
+            width: 100%; background-color: var(--primary-blue); color: white;
+            border: none; padding: 12px; border-radius: 6px; font-size: 14px;
+            font-weight: 600; cursor: pointer; transition: background-color 0.2s;
+        }
+        .btn-submit:hover { background-color: #1a40d6; }
     </style>
 </head>
 <body>
@@ -317,42 +133,15 @@
             <h1>Upachaar</h1>
             <p>Clinical Oversight</p>
         </div>
-
         <ul class="nav-menu">
-            <%-- FIX: all links use getContextPath() so they work from any URL --%>
-            <li class="nav-item active">
-                <a href="<%= request.getContextPath() %>/Admin-dashboard" class="nav-link">
-                    <i class="fa-solid fa-border-all"></i> Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="<%= request.getContextPath() %>/doctors" class="nav-link">
-                    <i class="fa-solid fa-stethoscope"></i> Doctors
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="<%= request.getContextPath() %>/patients" class="nav-link">
-                    <i class="fa-solid fa-users"></i> Patients
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="<%= request.getContextPath() %>/receptionists" class="nav-link">
-                    <i class="fa-solid fa-user-nurse"></i> Receptionists
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="<%= request.getContextPath() %>/appointments" class="nav-link">
-                    <i class="fa-regular fa-calendar"></i> Appointments
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="<%= request.getContextPath() %>/billing" class="nav-link">
-                    <i class="fa-solid fa-file-invoice-dollar"></i> Billing
-                </a>
-            </li>
+            <li class="nav-item active"><a href="<%= request.getContextPath() %>/Admin-dashboard" class="nav-link"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+            <li class="nav-item"><a href="<%= request.getContextPath() %>/doctors" class="nav-link"><i class="fa-solid fa-stethoscope"></i> Doctors</a></li>
+            <li class="nav-item"><a href="<%= request.getContextPath() %>/patients" class="nav-link"><i class="fa-solid fa-users"></i> Patients</a></li>
+            <li class="nav-item"><a href="<%= request.getContextPath() %>/receptionists" class="nav-link"><i class="fa-solid fa-user-nurse"></i> Receptionists</a></li>
+            <li class="nav-item"><a href="<%= request.getContextPath() %>/appointments" class="nav-link"><i class="fa-regular fa-calendar"></i> Appointments</a></li>
+            <li class="nav-item"><a href="<%= request.getContextPath() %>/billing" class="nav-link"><i class="fa-solid fa-file-invoice-dollar"></i> Billing</a></li>
         </ul>
     </div>
-
     <div class="sidebar-bottom">
         <div class="social-links">
             <p>Follow us</p>
@@ -360,7 +149,6 @@
             <i class="fa-brands fa-twitter"></i>
             <i class="fa-regular fa-envelope"></i>
         </div>
-
         <div class="user-profile">
             <div class="avatar"><%= userName.substring(0, 1).toUpperCase() %></div>
             <div class="user-info">
@@ -372,7 +160,6 @@
 </aside>
 
 <div class="main-wrapper">
-
     <header class="topbar">
         <div class="topbar-left">Dashboard</div>
         <div class="topbar-right">
@@ -386,12 +173,8 @@
     </header>
 
     <main class="content">
-
-        <%-- Error banner — remove after confirming fix --%>
         <% if (errorMessage != null) { %>
-        <div class="error-banner">
-            <strong>Error:</strong> <%= errorMessage %>
-        </div>
+        <div class="error-banner"><strong>Error:</strong> <%= errorMessage %></div>
         <% } %>
 
         <div class="page-header">
@@ -399,69 +182,243 @@
             <p>Clinical Oversight Dashboard</p>
         </div>
 
-        <%-- FIX: replaced all hardcoded mock values with real servlet data --%>
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3>Total Doctors</h3>
-                    <div class="value"><%= totalDoctors %></div>
-                </div>
-                <div class="stat-icon">
-                    <i class="fa-solid fa-stethoscope"></i>
-                </div>
+                <div class="stat-info"><h3>Total Doctors</h3><div class="value"><%= totalDoctors %></div></div>
+                <div class="stat-icon"><i class="fa-solid fa-stethoscope"></i></div>
             </div>
-
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3>Total Patients</h3>
-                    <div class="value"><%= totalPatients %></div>
-                </div>
-                <div class="stat-icon">
-                    <i class="fa-solid fa-user-group"></i>
-                </div>
+                <div class="stat-info"><h3>Total Patients</h3><div class="value"><%= totalPatients %></div></div>
+                <div class="stat-icon"><i class="fa-solid fa-user-group"></i></div>
             </div>
-
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3>Total Receptionists</h3>
-                    <div class="value"><%= totalReceptionists %></div>
-                </div>
-                <div class="stat-icon">
-                    <i class="fa-solid fa-user-nurse"></i>
-                </div>
+                <div class="stat-info"><h3>Total Receptionists</h3><div class="value"><%= totalReceptionists %></div></div>
+                <div class="stat-icon"><i class="fa-solid fa-user-nurse"></i></div>
             </div>
-
             <div class="stat-card">
-                <div class="stat-info">
-                    <h3>Total Revenue</h3>
-                    <div class="value">NPR <%= String.format("%,.2f", totalRevenue) %></div>
-                </div>
-                <div class="stat-icon">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                </div>
+                <div class="stat-info"><h3>Total Revenue</h3><div class="value">NPR <%= String.format("%,.2f", totalRevenue) %></div></div>
+                <div class="stat-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
             </div>
         </div>
 
         <div class="card">
             <h3 class="card-title">Quick Actions</h3>
             <div class="quick-actions-grid">
-                <%-- FIX: direct links instead of a single form with action values --%>
-                <a href="<%= request.getContextPath() %>/admin/addDoctor.jsp"   class="btn-quick-action">Add Doctor</a>
-                <a href="<%= request.getContextPath() %>/admin/addPatient.jsp"  class="btn-quick-action">Add Patient</a>
-                <a href="<%= request.getContextPath() %>/appointments"          class="btn-quick-action">Schedule Appointment</a>
-                <a href="<%= request.getContextPath() %>/billing"               class="btn-quick-action">View Billing</a>
+                <button onclick="openModal('doctorModal')" class="btn-quick-action">Add Doctor</button>
+                <button onclick="openModal('patientModal')" class="btn-quick-action">Add Patient</button>
+                <button onclick="openModal('receptionistModal')" class="btn-quick-action">Add Receptionist</button>
+                <a href="<%= request.getContextPath() %>/billing" class="btn-quick-action">View Billing</a>
             </div>
         </div>
 
         <div class="card">
             <h3 class="card-title">Recent Activity</h3>
-            <div class="recent-activity-container">
-                No recent activity to display
-            </div>
+            <div class="recent-activity-container">No recent activity to display</div>
         </div>
-
     </main>
 </div>
+<div id="doctorModal" class="modal-overlay">
+    <div class="modal-content" style="width: 650px;">
+        <i class="fa-solid fa-xmark close-btn" onclick="closeModal('doctorModal')"></i>
+        <h3>Add New Doctor</h3>
+
+        <form action="<%= request.getContextPath() %>/add-doctor" method="POST" enctype="multipart/form-data">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required placeholder="Dr. Samir Rai">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required placeholder="samir@curecloud.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Temporary Password</label>
+                    <input type="password" name="password" required placeholder="Initial Password">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone" required placeholder="+977-XXXXXXXXXX">
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select name="gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob" required>
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Home Address</label>
+                    <input type="text" name="address" required placeholder="Itahari, Koshi Province">
+                </div>
+
+                <div class="form-group">
+                    <label>Department</label>
+                    <select name="department" required>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="General Medicine">General Medicine</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Experience (Years)</label>
+                    <input type="number" name="experienceYears" min="0" required placeholder="e.g. 10">
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Qualifications</label>
+                    <input type="text" name="qualifications" required placeholder="MBBS, MD (Neurology)">
+                </div>
+
+                <%-- UPDATED STATUS DROPDOWN --%>
+                <div class="form-group">
+                    <label>Account Status</label>
+                    <select name="status" required>
+                        <option value="Active">Active</option>
+                        <option value="On Leave">On Leave</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Profile Photo</label>
+                    <input type="file" name="profileImage" accept="image/*">
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit" style="margin-top: 15px;">
+                <i class="fa-solid fa-user-plus"></i> Register Doctor
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="patientModal" class="modal-overlay">
+    <div class="modal-content" style="width: 650px;">
+        <i class="fa-solid fa-xmark close-btn" onclick="closeModal('patientModal')"></i>
+        <h3>Add New Patient</h3>
+
+        <form action="<%= request.getContextPath() %>/add-patient" method="POST" enctype="multipart/form-data">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required placeholder="Jane Doe">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required placeholder="patient@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required placeholder="Password">
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" name="phone" required placeholder="Mobile Number">
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select name="gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob" required>
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Address</label>
+                    <input type="text" name="address" required placeholder="Full Address">
+                </div>
+
+                <div class="form-group">
+                    <label>Blood Group</label>
+                    <select name="bloodGroup" required>
+                        <option value="" disabled selected>Select Blood Group</option>
+                        <option value="A+">A+</option><option value="A-">A-</option>
+                        <option value="B+">B+</option><option value="B-">B-</option>
+                        <option value="O+">O+</option><option value="O-">O-</option>
+                        <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Profile Image (Optional)</label>
+                    <input type="file" name="profileImage" accept="image/*">
+                </div>
+
+            </div>
+            <button type="submit" class="btn-submit" style="margin-top: 15px;">Add Patient</button>
+        </form>
+    </div>
+</div>
+
+<div id="receptionistModal" class="modal-overlay">
+    <div class="modal-content">
+        <i class="fa-solid fa-xmark close-btn" onclick="closeModal('receptionistModal')"></i>
+        <h3>Add Receptionist</h3>
+        <form action="<%= request.getContextPath() %>/add-receptionist" method="POST">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="name" required placeholder="Name">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status" required>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-submit">Add Receptionist</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Open a specific modal
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'flex';
+    }
+
+    // Close a specific modal
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Close the modal if the user clicks anywhere outside of the white modal box
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            event.target.style.display = 'none';
+        }
+    }
+</script>
 
 </body>
 </html>

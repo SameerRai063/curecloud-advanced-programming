@@ -3,9 +3,7 @@ package Doctor.Model.dao;
 import Doctor.Model.Doctor;
 import User.Model.User;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,19 +17,7 @@ public class DoctorDAO implements DoctorInterface {
         this.con = con;
     }
 
-    @Override
-    public boolean addDoctor(Doctor doctor) throws Exception {
-        String sql = "INSERT INTO doctor(user_id, status, qualifications, department, experience_years) VALUES (?, ?, ?, ?, ?)";
 
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, doctor.getUserId());
-        ps.setString(2, doctor.getStatus());
-        ps.setString(3, doctor.getQualifications());
-        ps.setString(4, doctor.getDepartment());
-        ps.setInt(5, doctor.getExperienceYears());
-
-        return ps.executeUpdate() > 0;
-    }
 
     @Override
     public List<Doctor> getAllDoctors() throws Exception {
@@ -138,5 +124,64 @@ public class DoctorDAO implements DoctorInterface {
         }
 
         return stats;
+    }
+    @Override
+    public boolean addDoctor(Doctor doctor) throws Exception {
+        User user = doctor.getUser();
+        if (user == null) return false;
+
+        String userQuery = "INSERT INTO users (name, gender, dob, address, phone, email, password, role, profile_image) VALUES (?, ?, ?, ?, ?, ?, ?, 'doctor', ?)";
+        String doctorQuery = "INSERT INTO doctor (user_id, status, qualifications, department, experience_years) VALUES (?, ?, ?, ?, ?)";
+
+        boolean originalAutoCommit = con.getAutoCommit();
+
+        try {
+            con.setAutoCommit(false); // Start Transaction
+
+            // 1. Insert into Users Table
+            int generatedUserId = -1;
+            try (PreparedStatement userStmt = con.prepareStatement(userQuery, Statement.RETURN_GENERATED_KEYS)) {
+                userStmt.setString(1, user.getName());
+                userStmt.setString(2, user.getGender());
+                userStmt.setDate(3, user.getDob());
+                userStmt.setString(4, user.getAddress());
+                userStmt.setString(5, user.getPhone());
+                userStmt.setString(6, user.getEmail());
+                userStmt.setString(7, user.getPassword()); // In a real app, hash this!
+                userStmt.setString(8, user.getProfileImage());
+
+                int affectedRows = userStmt.executeUpdate();
+                if (affectedRows == 0) throw new SQLException("Creating user failed, no rows affected.");
+
+                try (ResultSet generatedKeys = userStmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        generatedUserId = generatedKeys.getInt(1);
+                    } else {
+                        throw new SQLException("Creating user failed, no ID obtained.");
+                    }
+                }
+            }
+
+            // 2. Insert into Doctors Table
+            try (PreparedStatement doctorStmt = con.prepareStatement(doctorQuery)) {
+                doctorStmt.setInt(1, generatedUserId);
+                doctorStmt.setString(2, doctor.getStatus());
+                doctorStmt.setString(3, doctor.getQualifications());
+                doctorStmt.setString(4, doctor.getDepartment());
+                doctorStmt.setInt(5, doctor.getExperienceYears());
+
+                doctorStmt.executeUpdate();
+            }
+
+            con.commit(); // Success
+            return true;
+
+        } catch (Exception e) {
+            con.rollback(); // Undo everything if any part fails
+            e.printStackTrace();
+            throw e;
+        } finally {
+            con.setAutoCommit(originalAutoCommit);
+        }
     }
 }

@@ -2,9 +2,8 @@ package Patient.Model.dao;
 
 import Patient.Model.Patient;
 import User.Model.User;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,14 +15,61 @@ public class PatientDAO implements PatientInterface {
         this.con = con;
     }
 
-    @Override
     public boolean addPatient(Patient patient) throws Exception {
-        String sql = "INSERT INTO patient(user_id, blood_group, is_active) VALUES (?, ?, ?)";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, patient.getUserId());
-        ps.setString(2, patient.getBloodGroup());
-        ps.setString(3, patient.isActive() ? "yes" : "no");
-        return ps.executeUpdate() > 0;
+        User user = patient.getUser();
+        if (user == null) return false;
+
+        String userQuery = "INSERT INTO users (name, gender, dob, address, phone, email, password, role, profile_image) VALUES (?, ?, ?, ?, ?, ?, ?, 'patient', ?)";
+        String patientQuery = "INSERT INTO patient (user_id, blood_group, is_active) VALUES (?, ?, ?)";
+
+        boolean originalAutoCommit = con.getAutoCommit();
+
+        try {
+            con.setAutoCommit(false); // Start Transaction
+
+            // 1. Insert into Users Table
+            int generatedUserId = -1;
+            try (PreparedStatement userStmt = con.prepareStatement(userQuery, Statement.RETURN_GENERATED_KEYS)) {
+                userStmt.setString(1, user.getName());
+                userStmt.setString(2, user.getGender());
+                userStmt.setDate(3, user.getDob());
+                userStmt.setString(4, user.getAddress());
+                userStmt.setString(5, user.getPhone());
+                userStmt.setString(6, user.getEmail());
+                userStmt.setString(7, user.getPassword());
+                userStmt.setString(8, user.getProfileImage());
+
+                int affectedRows = userStmt.executeUpdate();
+                if (affectedRows == 0) throw new SQLException("Creating user failed, no rows affected.");
+
+                try (ResultSet generatedKeys = userStmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        generatedUserId = generatedKeys.getInt(1);
+                    } else {
+                        throw new SQLException("Creating user failed, no ID obtained.");
+                    }
+                }
+            }
+
+            // 2. Insert into Patients Table
+            try (PreparedStatement patientStmt = con.prepareStatement(patientQuery)) {
+                patientStmt.setInt(1, generatedUserId);
+                patientStmt.setString(2, patient.getBloodGroup());
+                patientStmt.setBoolean(3, patient.isActive());
+
+                patientStmt.executeUpdate();
+            }
+
+            con.commit(); // Success
+            return true;
+
+        } catch (Exception e) {
+            con.rollback(); // Undo everything on failure
+            e.printStackTrace();
+            throw e;
+        } finally {
+            con.setAutoCommit(originalAutoCommit);
+        }
     }
 
     @Override

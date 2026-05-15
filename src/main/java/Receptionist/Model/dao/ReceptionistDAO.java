@@ -17,17 +17,14 @@ public class ReceptionistDAO implements ReceptionistInterface {
         this.con = con;
     }
 
-    @Override
-    public boolean addReceptionist(Receptionist receptionist) throws Exception {
-        String sql = "INSERT INTO receptionist(user_id, status) VALUES (?, ?)";
 
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, receptionist.getUserId());
-        ps.setString(2, receptionist.getStatus());
-
-        return ps.executeUpdate() > 0;
-    }
-
+@Override
+public boolean addReceptionist(Receptionist receptionist) throws Exception{
+    String sql = "DELETE FROM receptionist WHERE user_id=?";
+    PreparedStatement ps = con.prepareStatement(sql);
+    ps.setInt(1, receptionist.getUserId());
+    return ps.executeUpdate() > 0;
+}
     @Override
     public List<Receptionist> getAllReceptionists() throws Exception {
         List<Receptionist> receptionists = new ArrayList<>();

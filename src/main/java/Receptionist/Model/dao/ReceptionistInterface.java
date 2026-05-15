@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface ReceptionistInterface {
 
-    boolean addReceptionist(Receptionist receptionist) throws Exception;
+boolean addReceptionist(Receptionist receptionist) throws Exception;
 
     boolean deleteReceptionist(int userId) throws Exception;
     boolean updateReceptionistProfile(Receptionist receptionist, String currentPassword, String newPassword) throws Exception;
