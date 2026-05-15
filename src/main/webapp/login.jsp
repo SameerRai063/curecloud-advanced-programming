@@ -106,6 +106,7 @@
 </head>
 <body class="bg-background min-h-screen flex items-center justify-center font-body-md text-body-md text-on-surface">
 <div class="w-full max-w-7xl mx-auto min-h-screen flex flex-col md:flex-row bg-background relative overflow-hidden shadow-[0_8px_30px_rgba(47,65,86,0.05)] border-4 border-white rounded-xl">
+
     <div class="hidden md:block md:w-1/2 relative bg-surface-variant">
         <div class="absolute top-gutter left-gutter z-20">
             <div class="border border-white/80 rounded-[4px] px-md py-sm bg-transparent backdrop-blur-sm">
@@ -115,7 +116,16 @@
         <img alt="A high-quality 3D minimalist illustration of a friendly doctor advising a patient." class="absolute inset-0 w-full h-full object-cover" data-alt="A high-quality 3D minimalist illustration of a friendly doctor advising a patient." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDDeFkvl4CxBUr3zaFSzFsT0cQ5F4zKop32QPPR8Z5Ly4-S2JJMeICQRblzN0R2bVfb6VQP3dkswA5EYb-20wq2eO692EREzOYPDQKRRoXbveMgWv3NeaNRzq4WwkRqTYYNE-DJi16BSQIe94MhQJyks1jcPPEbKUdzLbh0tSZeu2Jc2sG4GBK-eKMoS0WkVnHPoQY9e7RMP45bNpOE7Tcxp1mwfh3dThQmOPYx6EUN3lgwYSE90-2vf2ariFt2KzxvT8H9h2o83cU"/>
         <div class="absolute inset-0 bg-primary/10"></div>
     </div>
+
     <div class="w-full md:w-1/2 flex flex-col bg-surface-container-lowest rounded-tl-[3rem] md:-ml-8 z-10 p-gutter md:p-xl relative min-h-screen justify-between shadow-[0_8px_30px_rgba(47,65,86,0.08)] rounded-bl-[3rem]">
+
+        <a href="${pageContext.request.contextPath}/"
+           class="absolute top-gutter left-gutter md:top-xl md:left-xl flex items-center gap-xs px-sm py-xs text-on-surface-variant hover:text-primary hover:bg-surface-variant rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 z-20"
+           aria-label="Return to home page">
+            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+            <span class="font-button text-body-sm">Home</span>
+        </a>
+
         <div class="flex-grow flex flex-col justify-center max-w-md mx-auto w-full">
             <div class="mb-lg">
                 <h1 class="font-headline-lg text-headline-lg text-primary-container mb-base">Welcome Back</h1>
@@ -179,4 +189,5 @@
         </div>
     </div>
 </div>
-</body></html>
+</body>
+</html>
