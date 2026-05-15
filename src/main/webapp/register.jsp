@@ -121,25 +121,33 @@
 <body class="bg-background min-h-screen flex items-center justify-center font-body-md text-on-background">
 
 <main class="w-full max-w-7xl mx-auto min-h-screen flex flex-col md:flex-row bg-background relative overflow-hidden shadow-[0_8px_30px_rgba(47,65,86,0.05)] border-4 border-white rounded-xl">
+
   <div class="hidden md:block md:w-1/2 relative bg-secondary-fixed/50 overflow-hidden">
     <div class="absolute top-gutter left-gutter z-20">
       <div class="px-sm py-xs border-2 border-surface-container-lowest rounded-md bg-transparent text-surface-container-lowest font-headline-sm tracking-widest uppercase shadow-sm">
         UPACHAR
       </div>
     </div>
-    <img alt="Illustration" class="absolute inset-0 w-full h-full object-cover object-center mix-blend-multiply opacity-90" data-alt="A high-quality 3D minimalist matte clay render style illustration of a doctor and patient interacting in a serene, modern clinical setting. The background is a soft, calming sky blue. The characters are stylized with soft edges and a smooth, untextured finish, embodying a sophisticated, highly accessible, and deeply professional hospital management environment. Lighting is diffused and soft, creating gentle ambient shadows that suggest a clean, trustworthy atmosphere." src="https://lh3.googleusercontent.com/aida/ADBb0uinVHRWTl-slXDdcxYJ-HTsgYe2dq1RpuRWoyyu77JoWgFPSeHOvLX4xQIffSYenRTcDXwqvlOg0ioN0VOxdqNGSn86rRicOEylCMBMsUfh1VR9BxyskjdR5xBRBQZir-TqR7c5nwWO1S2g8Aurml0p9ll2_XiWRfZiEJGEjbC-MSlheNGIDytH9KhkKg1P_A_mLa4aZTUmMHSYlf6yjtj9eJGTlnHh3-jsmXzLo6c4N8wBD4D5RIJJt22U"/>
+    <img alt="Illustration" class="absolute inset-0 w-full h-full object-cover object-center mix-blend-multiply opacity-90" data-alt="A high-quality 3D minimalist matte clay render style illustration of a doctor and patient interacting in a serene, modern clinical setting..." src="https://lh3.googleusercontent.com/aida/ADBb0uinVHRWTl-slXDdcxYJ-HTsgYe2dq1RpuRWoyyu77JoWgFPSeHOvLX4xQIffSYenRTcDXwqvlOg0ioN0VOxdqNGSn86rRicOEylCMBMsUfh1VR9BxyskjdR5xBRBQZir-TqR7c5nwWO1S2g8Aurml0p9ll2_XiWRfZiEJGEjbC-MSlheNGIDytH9KhkKg1P_A_mLa4aZTUmMHSYlf6yjtj9eJGTlnHh3-jsmXzLo6c4N8wBD4D5RIJJt22U"/>
     <div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
   </div>
 
   <div class="w-full md:w-1/2 flex flex-col bg-surface-container-lowest rounded-tl-[3rem] md:-ml-8 z-10 p-gutter md:p-xl relative min-h-screen justify-between shadow-[0_8px_30px_rgba(47,65,86,0.08)] rounded-bl-[3rem]">
-    <div class="flex-grow flex flex-col justify-center max-w-md mx-auto w-full">
+
+    <a href="${pageContext.request.contextPath}/"
+       class="absolute top-gutter left-gutter md:top-xl md:left-xl flex items-center gap-xs px-sm py-xs text-on-surface-variant hover:text-primary hover:bg-surface-variant rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 z-20"
+       aria-label="Return to home page">
+      <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+      <span class="font-button text-body-sm">Home</span>
+    </a>
+
+    <div class="flex-grow flex flex-col justify-center max-w-md mx-auto w-full mt-10 md:mt-0">
       <div class="mb-lg">
         <h1 class="font-headline-lg text-primary mb-xs">Create Account</h1>
         <p class="font-body-md text-on-surface-variant">Join Upachar to manage your healthcare journey.</p>
       </div>
 
-      <%-- JSP Form bindings with updated action --%>
-      <form action="${pageContext.request.contextPath}/register-patient" method="POST" class="space-y-md">
+      <form action="${pageContext.request.contextPath}/register-patient" method="POST" class="flex flex-col gap-y-md">
 
         <%-- Alert Messages --%>
         <c:if test="${not empty requestScope.errorMessage}">
@@ -153,7 +161,8 @@
           </div>
         </c:if>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-sm gap-y-4">
+
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="fullName">Full Name</label>
             <div class="relative">
@@ -161,6 +170,7 @@
               <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="fullName" name="fullName" value="${param.fullName}" placeholder="John Doe" type="text" required/>
             </div>
           </div>
+
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="dob">Date of Birth</label>
             <div class="relative">
@@ -168,9 +178,7 @@
               <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md text-on-surface-variant" id="dob" name="dob" value="${param.dob}" type="date" required/>
             </div>
           </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="email">Email Address</label>
             <div class="relative">
@@ -178,6 +186,7 @@
               <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="email" name="email" value="${param.email}" placeholder="john@example.com" type="email" required/>
             </div>
           </div>
+
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="phone">Contact Number</label>
             <div class="relative">
@@ -185,9 +194,7 @@
               <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="phone" name="phone" value="${param.phone}" placeholder="+1 (555) 000-0000" type="tel" required/>
             </div>
           </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="bloodGroup">Blood Group</label>
             <div class="relative">
@@ -206,6 +213,7 @@
               <span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px] pointer-events-none">expand_more</span>
             </div>
           </div>
+
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="gender">Gender</label>
             <div class="relative">
@@ -219,34 +227,33 @@
               <span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px] pointer-events-none">expand_more</span>
             </div>
           </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
-          <div>
+          <div class="col-span-1 md:col-span-2">
+            <label class="block font-label-md text-on-surface-variant mb-xs" for="address">Full Address</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">home_pin</span>
+              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="address" name="address" value="${param.address}" placeholder="123 Main Street, City, Country" type="text" required/>
+            </div>
+          </div>
+
+          <div class="col-span-1 md:col-span-2">
             <label class="block font-label-md text-on-surface-variant mb-xs" for="password">Password</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">lock</span>
-              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-10 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="password" name="password" placeholder="••••••••" type="password" required/>
-              <button class="absolute right-sm top-1/2 -translate-y-1/2 text-outline-variant hover:text-primary transition-colors" type="button">
-                <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-12 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="password" name="password" placeholder="••••••••" type="password" required/>
+
+              <button id="togglePasswordBtn" class="absolute right-0 top-0 h-full px-4 text-outline-variant hover:text-primary transition-colors flex items-center justify-center rounded-r-2xl focus:outline-none focus:text-primary" type="button" aria-label="Toggle password visibility">
+                <span id="togglePasswordIcon" class="material-symbols-outlined text-[20px]">visibility_off</span>
               </button>
             </div>
           </div>
-          <div>
-            <label class="block font-label-md text-on-surface-variant mb-xs" for="confirmPassword">Confirm Password</label>
-            <div class="relative">
-              <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">lock_reset</span>
-              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-10 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="confirmPassword" name="confirmPassword" placeholder="••••••••" type="password" required/>
-            </div>
-          </div>
-        </div>
 
-        <div class="pt-sm">
-          <button class="w-full bg-primary-container text-on-primary font-button py-4 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-ambient" type="submit">
-            Sign Up
-            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
-          </button>
-        </div>
+        </div> <div class="pt-sm">
+        <button class="w-full bg-primary-container text-on-primary font-button py-4 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-ambient" type="submit">
+          Sign Up
+          <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+        </button>
+      </div>
       </form>
 
       <div class="mt-lg text-center">
@@ -258,5 +265,26 @@
     </div>
   </div>
 </main>
+
+<script>
+  // Toggle Password Visibility Logic
+  document.addEventListener('DOMContentLoaded', function() {
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('togglePasswordIcon');
+
+    if(togglePasswordBtn && passwordInput && toggleIcon) {
+      togglePasswordBtn.addEventListener('click', function() {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+
+        // Toggle input type
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+
+        // Toggle icon text (Material Symbols uses text content for icons)
+        toggleIcon.textContent = isPassword ? 'visibility' : 'visibility_off';
+      });
+    }
+  });
+</script>
 </body>
 </html>
