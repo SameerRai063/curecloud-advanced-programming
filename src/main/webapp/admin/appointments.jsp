@@ -74,12 +74,26 @@
   <div class="sidebar-top">
     <div class="brand"><h1>Upachaar</h1><p>Clinical Oversight</p></div>
     <ul class="nav-menu">
-      <li class="nav-item"><a href="dashboard.jsp" class="nav-link"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
-      <li class="nav-item"><a href="doctors.jsp" class="nav-link"><i class="fa-solid fa-stethoscope"></i> Doctors</a></li>
-      <li class="nav-item"><a href="patients.jsp" class="nav-link"><i class="fa-solid fa-users"></i> Patients</a></li>
-      <li class="nav-item"><a href="receptionists.jsp" class="nav-link"><i class="fa-solid fa-user-nurse"></i> Receptionists</a></li>
-      <li class="nav-item active"><a href="appointments.jsp" class="nav-link"><i class="fa-regular fa-calendar"></i> Appointments</a></li>
-      <li class="nav-item"><a href="billing.jsp" class="nav-link"><i class="fa-solid fa-file-invoice-dollar"></i> Billing</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/Admin-dashboard" class="nav-link">
+          <i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/doctors" class="nav-link">
+          <i class="fa-solid fa-stethoscope"></i> Doctors</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/patients" class="nav-link">
+          <i class="fa-solid fa-users"></i> Patients</a></li>
+      <li class="nav-item">
+        <a href="<%= request.getContextPath() %>/receptionists" class="nav-link">
+        <i class="fa-solid fa-user-nurse">
+
+        </i> Receptionists</a></li>
+      <li class="nav-item active">
+        <a href="appointments.jsp" class="nav-link">
+          <i class="fa-regular fa-calendar"></i> Appointments</a></li>
+      <li class="nav-item">
+        <a href="billing.jsp" class="nav-link">
+          <i class="fa-solid fa-file-invoice-dollar"></i> Billing</a></li>
     </ul>
   </div>
   <div class="user-profile">

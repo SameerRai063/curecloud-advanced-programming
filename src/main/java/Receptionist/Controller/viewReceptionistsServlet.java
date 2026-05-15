@@ -1,5 +1,6 @@
 package Receptionist.Controller;
 
+import Receptionist.Model.Receptionist;
 import Receptionist.Model.dao.ReceptionistDAO;
 import utils.DBConnection;
 
@@ -12,8 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
 
-@WebServlet("/deleteReceptionist")
-public class deleteReceptionistServlet extends HttpServlet {
+@WebServlet("/viewReceptionist")
+public class viewReceptionistsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -21,35 +22,39 @@ public class deleteReceptionistServlet extends HttpServlet {
 
         String idParam = request.getParameter("id");
 
-        // 1. Validate the ID parameter
+        // 🔹 Validate ID
         if (idParam == null || idParam.trim().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/receptionists?error=missing_id");
             return;
         }
 
-        try (Connection con = DBConnection.getConnection()) {
-            int userId = Integer.parseInt(idParam.trim());
-
-            // 2. Initialize DAO with the connection
-            ReceptionistDAO receptionistDAO = new ReceptionistDAO(con);
-
-            // 3. Perform the transaction-safe deletion
-            boolean isDeleted = receptionistDAO.deleteReceptionist(userId);
-
-            if (isDeleted) {
-                // 4. Redirect back with success message
-                response.sendRedirect(request.getContextPath() + "/receptionists?success=deleted");
-            } else {
-                // Case where the ID wasn't found in the database
-                response.sendRedirect(request.getContextPath() + "/receptionists?error=not_found");
-            }
-
+        int userId;
+        try {
+            userId = Integer.parseInt(idParam.trim());
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/receptionists?error=invalid_id");
+            return;
+        }
+
+        // 🔹 Database operation
+        try (Connection con = DBConnection.getConnection()) {
+
+            ReceptionistDAO receptionistDAO = new ReceptionistDAO(con);
+            Receptionist receptionist = receptionistDAO.getReceptionistById(userId);
+
+            // 🔹 Check if found
+            if (receptionist == null) {
+                response.sendRedirect(request.getContextPath() + "/receptionists?error=not_found");
+                return;
+            }
+
+            // 🔹 Send to JSP
+            request.setAttribute("receptionist", receptionist);
+            request.getRequestDispatcher("/viewReceptionist.jsp").forward(request, response);
+
         } catch (Exception e) {
             e.printStackTrace();
-            // Handle DB errors or foreign key violations
-            response.sendRedirect(request.getContextPath() + "/receptionists?error=delete_failed");
+            response.sendRedirect(request.getContextPath() + "/receptionists?error=load_failed");
         }
     }
 }

@@ -70,6 +70,7 @@ public class addDoctorServlet extends HttpServlet { // Changed to Uppercase
             // 4. DB Operations
             con = DBConnection.getConnection();
             DoctorDAO doctorDAO = new DoctorDAO(con);
+
             boolean success = doctorDAO.addDoctor(doctor);
 
             if (success) {

@@ -377,26 +377,71 @@
 </div>
 
 <div id="receptionistModal" class="modal-overlay">
-    <div class="modal-content">
+    <div class="modal-content" style="width: 650px;">
         <i class="fa-solid fa-xmark close-btn" onclick="closeModal('receptionistModal')"></i>
-        <h3>Add Receptionist</h3>
-        <form action="<%= request.getContextPath() %>/add-receptionist" method="POST">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" name="name" required placeholder="Name">
+        <h3>Add New Receptionist</h3>
+
+        <form action="<%= request.getContextPath() %>/add-receptionist" method="POST" enctype="multipart/form-data">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required placeholder="Jane Smith">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required placeholder="frontdesk@curecloud.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Temporary Password</label>
+                    <input type="password" name="password" required placeholder="Initial Password">
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" name="phone" required placeholder="+977-XXXXXXXXXX">
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select name="gender" required>
+                        <option value="" disabled selected>Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob" required>
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Home Address</label>
+                    <input type="text" name="address" required placeholder="Full Address">
+                </div>
+
+                <div class="form-group">
+                    <label>Account Status</label>
+                    <select name="status" required>
+                        <option value="Active" selected>Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Profile Image (Optional)</label>
+                    <input type="file" name="profileImage" accept="image/*">
+                </div>
+
             </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" name="email" required placeholder="Email">
-            </div>
-            <div class="form-group">
-                <label>Status</label>
-                <select name="status" required>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
-            </div>
-            <button type="submit" class="btn-submit">Add Receptionist</button>
+
+            <button type="submit" class="btn-submit" style="margin-top: 15px;">
+                <i class="fa-solid fa-user-plus"></i> Register Receptionist
+            </button>
         </form>
     </div>
 </div>

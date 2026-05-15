@@ -116,30 +116,50 @@
     .material-symbols-outlined {
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
+    #avatarPreview {
+      transition: opacity 0.2s ease;
+    }
+    #uploadZone:hover {
+      border-color: #3d6374;
+      background-color: #f0f8fc;
+    }
+    #uploadZone.drag-over {
+      border-color: #3d6374;
+      background-color: #e0f2fb;
+    }
   </style>
 </head>
 <body class="bg-background min-h-screen flex items-center justify-center font-body-md text-on-background">
 
 <main class="w-full max-w-7xl mx-auto min-h-screen flex flex-col md:flex-row bg-background relative overflow-hidden shadow-[0_8px_30px_rgba(47,65,86,0.05)] border-4 border-white rounded-xl">
+
+  <%-- Left illustration panel --%>
   <div class="hidden md:block md:w-1/2 relative bg-secondary-fixed/50 overflow-hidden">
     <div class="absolute top-gutter left-gutter z-20">
       <div class="px-sm py-xs border-2 border-surface-container-lowest rounded-md bg-transparent text-surface-container-lowest font-headline-sm tracking-widest uppercase shadow-sm">
         UPACHAR
       </div>
     </div>
-    <img alt="Illustration" class="absolute inset-0 w-full h-full object-cover object-center mix-blend-multiply opacity-90" data-alt="A high-quality 3D minimalist matte clay render style illustration of a doctor and patient interacting in a serene, modern clinical setting. The background is a soft, calming sky blue. The characters are stylized with soft edges and a smooth, untextured finish, embodying a sophisticated, highly accessible, and deeply professional hospital management environment. Lighting is diffused and soft, creating gentle ambient shadows that suggest a clean, trustworthy atmosphere." src="https://lh3.googleusercontent.com/aida/ADBb0uinVHRWTl-slXDdcxYJ-HTsgYe2dq1RpuRWoyyu77JoWgFPSeHOvLX4xQIffSYenRTcDXwqvlOg0ioN0VOxdqNGSn86rRicOEylCMBMsUfh1VR9BxyskjdR5xBRBQZir-TqR7c5nwWO1S2g8Aurml0p9ll2_XiWRfZiEJGEjbC-MSlheNGIDytH9KhkKg1P_A_mLa4aZTUmMHSYlf6yjtj9eJGTlnHh3-jsmXzLo6c4N8wBD4D5RIJJt22U"/>
+    <img alt="Illustration"
+         class="absolute inset-0 w-full h-full object-cover object-center mix-blend-multiply opacity-90"
+         src="https://lh3.googleusercontent.com/aida/ADBb0uinVHRWTl-slXDdcxYJ-HTsgYe2dq1RpuRWoyyu77JoWgFPSeHOvLX4xQIffSYenRTcDXwqvlOg0ioN0VOxdqNGSn86rRicOEylCMBMsUfh1VR9BxyskjdR5xBRBQZir-TqR7c5nwWO1S2g8Aurml0p9ll2_XiWRfZiEJGEjbC-MSlheNGIDytH9KhkKg1P_A_mLa4aZTUmMHSYlf6yjtj9eJGTlnHh3-jsmXzLo6c4N8wBD4D5RIJJt22U"/>
     <div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
   </div>
 
+  <%-- Right form panel --%>
   <div class="w-full md:w-1/2 flex flex-col bg-surface-container-lowest rounded-tl-[3rem] md:-ml-8 z-10 p-gutter md:p-xl relative min-h-screen justify-between shadow-[0_8px_30px_rgba(47,65,86,0.08)] rounded-bl-[3rem]">
     <div class="flex-grow flex flex-col justify-center max-w-md mx-auto w-full">
+
       <div class="mb-lg">
         <h1 class="font-headline-lg text-primary mb-xs">Create Account</h1>
         <p class="font-body-md text-on-surface-variant">Join Upachar to manage your healthcare journey.</p>
       </div>
 
-      <%-- JSP Form bindings with updated action --%>
-      <form action="${pageContext.request.contextPath}/register-patient" method="POST" class="space-y-md">
+      <%-- enctype="multipart/form-data" required for file upload --%>
+      <form action="${pageContext.request.contextPath}/register-patient"
+            method="POST"
+            enctype="multipart/form-data"
+            class="space-y-md">
 
         <%-- Alert Messages --%>
         <c:if test="${not empty requestScope.errorMessage}">
@@ -153,19 +173,75 @@
           </div>
         </c:if>
 
+        <%-- ===== PROFILE PHOTO UPLOAD ===== --%>
+        <div class="flex flex-col items-center gap-sm">
+          <p class="font-label-md text-on-surface-variant self-start">Profile Photo <span class="text-outline font-normal">(optional)</span></p>
+
+          <div class="flex items-center gap-md w-full">
+
+            <%-- Avatar preview circle --%>
+            <div class="relative flex-shrink-0">
+              <div id="avatarRing"
+                   class="w-20 h-20 rounded-full border-2 border-dashed border-tertiary-fixed-dim bg-surface-container flex items-center justify-center overflow-hidden">
+                <%-- Default icon shown before upload --%>
+                <span id="avatarIcon" class="material-symbols-outlined text-[40px] text-outline-variant">account_circle</span>
+                <%-- Preview image hidden until file chosen --%>
+                <img id="avatarPreview"
+                     src="#" alt="Profile preview"
+                     class="hidden w-full h-full object-cover rounded-full"/>
+              </div>
+              <%-- Remove button, shown after image selected --%>
+              <button id="removePhoto" type="button"
+                      class="hidden absolute -top-1 -right-1 w-6 h-6 rounded-full bg-error text-on-error flex items-center justify-center shadow-md hover:brightness-110 transition-all"
+                      onclick="clearPhoto()">
+                <span class="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </div>
+
+            <%-- Drop zone / click to upload --%>
+            <div id="uploadZone"
+                 class="flex-1 border-2 border-dashed border-tertiary-fixed-dim rounded-2xl p-sm cursor-pointer transition-all bg-surface-container-low"
+                 onclick="document.getElementById('profileImage').click()"
+                 ondragover="handleDragOver(event)"
+                 ondragleave="handleDragLeave(event)"
+                 ondrop="handleDrop(event)">
+              <div class="flex flex-col items-center gap-xs text-center pointer-events-none">
+                <span class="material-symbols-outlined text-[28px] text-secondary">cloud_upload</span>
+                <p class="font-body-sm text-on-surface-variant">
+                  <span class="text-secondary font-medium">Click to upload</span> or drag & drop
+                </p>
+                <p class="font-label-md text-outline">JPG, PNG or WEBP · Max 10 MB</p>
+                <p id="fileName" class="font-label-md text-secondary hidden"></p>
+              </div>
+            </div>
+
+            <%-- Hidden actual file input — name must match servlet's getPart("profileImage") --%>
+            <input type="file"
+                   id="profileImage"
+                   name="profileImage"
+                   accept="image/jpeg,image/png,image/webp"
+                   class="hidden"
+                   onchange="handleFileSelect(this)"/>
+          </div>
+        </div>
+        <%-- ===== END PROFILE PHOTO UPLOAD ===== --%>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
           <div>
-            <label class="block font-label-md text-on-surface-variant mb-xs" for="fullName">Full Name</label>
+            <label class="block font-label-md text-on-surface-variant mb-xs" for="name">Full Name</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">person</span>
-              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="fullName" name="fullName" value="${param.fullName}" placeholder="John Doe" type="text" required/>
+              <%-- FIX: name="name" to match servlet's getParameter("name") --%>
+              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md"
+                     id="name" name="name" value="${param.name}" placeholder="John Doe" type="text" required/>
             </div>
           </div>
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="dob">Date of Birth</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">calendar_today</span>
-              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md text-on-surface-variant" id="dob" name="dob" value="${param.dob}" type="date" required/>
+              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md text-on-surface-variant"
+                     id="dob" name="dob" value="${param.dob}" type="date" required/>
             </div>
           </div>
         </div>
@@ -175,15 +251,26 @@
             <label class="block font-label-md text-on-surface-variant mb-xs" for="email">Email Address</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">mail</span>
-              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="email" name="email" value="${param.email}" placeholder="john@example.com" type="email" required/>
+              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md"
+                     id="email" name="email" value="${param.email}" placeholder="john@example.com" type="email" required/>
             </div>
           </div>
           <div>
             <label class="block font-label-md text-on-surface-variant mb-xs" for="phone">Contact Number</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">call</span>
-              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="phone" name="phone" value="${param.phone}" placeholder="+1 (555) 000-0000" type="tel" required/>
+              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md"
+                     id="phone" name="phone" value="${param.phone}" placeholder="+1 (555) 000-0000" type="tel" required/>
             </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-label-md text-on-surface-variant mb-xs" for="address">Address</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-sm top-4 text-outline-variant text-[20px]">location_on</span>
+            <textarea class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md resize-none"
+                      id="address" name="address" rows="2" placeholder="123 Main St, City, Country">${param.address}</textarea>
           </div>
         </div>
 
@@ -192,8 +279,9 @@
             <label class="block font-label-md text-on-surface-variant mb-xs" for="bloodGroup">Blood Group</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">water_drop</span>
-              <select class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-surface-variant focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md appearance-none" id="bloodGroup" name="bloodGroup" required>
-                <option disabled="" selected="" value="">Select Group</option>
+              <select class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-surface-variant focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md appearance-none"
+                      id="bloodGroup" name="bloodGroup" required>
+                <option disabled selected value="">Select Group</option>
                 <option value="A+">A+</option>
                 <option value="A-">A-</option>
                 <option value="B+">B+</option>
@@ -210,8 +298,9 @@
             <label class="block font-label-md text-on-surface-variant mb-xs" for="gender">Gender</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">wc</span>
-              <select class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-surface-variant focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md appearance-none" id="gender" name="gender" required>
-                <option disabled="" selected="" value="">Select Gender</option>
+              <select class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-4 text-on-surface-variant focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md appearance-none"
+                      id="gender" name="gender" required>
+                <option disabled selected value="">Select Gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
                 <option value="other">Other</option>
@@ -226,8 +315,10 @@
             <label class="block font-label-md text-on-surface-variant mb-xs" for="password">Password</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">lock</span>
-              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-10 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="password" name="password" placeholder="••••••••" type="password" required/>
-              <button class="absolute right-sm top-1/2 -translate-y-1/2 text-outline-variant hover:text-primary transition-colors" type="button">
+              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-10 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md"
+                     id="password" name="password" placeholder="••••••••" type="password" required/>
+              <button class="absolute right-sm top-1/2 -translate-y-1/2 text-outline-variant hover:text-primary transition-colors"
+                      type="button" onclick="togglePassword('password', this)">
                 <span class="material-symbols-outlined text-[20px]">visibility_off</span>
               </button>
             </div>
@@ -236,17 +327,24 @@
             <label class="block font-label-md text-on-surface-variant mb-xs" for="confirmPassword">Confirm Password</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">lock_reset</span>
-              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-10 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md" id="confirmPassword" name="confirmPassword" placeholder="••••••••" type="password" required/>
+              <input class="w-full bg-surface-container-lowest border border-tertiary-fixed-dim rounded-2xl py-3 pl-10 pr-10 text-on-background focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-body-md"
+                     id="confirmPassword" name="confirmPassword" placeholder="••••••••" type="password" required/>
+              <button class="absolute right-sm top-1/2 -translate-y-1/2 text-outline-variant hover:text-primary transition-colors"
+                      type="button" onclick="togglePassword('confirmPassword', this)">
+                <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+              </button>
             </div>
           </div>
         </div>
 
         <div class="pt-sm">
-          <button class="w-full bg-primary-container text-on-primary font-button py-4 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-ambient" type="submit">
+          <button class="w-full bg-primary-container text-on-primary font-button py-4 rounded-full hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-ambient"
+                  type="submit">
             Sign Up
             <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
           </button>
         </div>
+
       </form>
 
       <div class="mt-lg text-center">
@@ -258,5 +356,76 @@
     </div>
   </div>
 </main>
+
+<script>
+  // ── Profile photo upload ──────────────────────────────────────────
+  function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+      applyFile(input.files[0]);
+    }
+  }
+
+  function applyFile(file) {
+    if (!file.type.match('image.*')) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      document.getElementById('avatarPreview').src = e.target.result;
+      document.getElementById('avatarPreview').classList.remove('hidden');
+      document.getElementById('avatarIcon').classList.add('hidden');
+      document.getElementById('removePhoto').classList.remove('hidden');
+      document.getElementById('avatarRing').classList.replace('border-dashed', 'border-solid');
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('fileName').classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearPhoto() {
+    document.getElementById('profileImage').value = '';
+    document.getElementById('avatarPreview').src = '#';
+    document.getElementById('avatarPreview').classList.add('hidden');
+    document.getElementById('avatarIcon').classList.remove('hidden');
+    document.getElementById('removePhoto').classList.add('hidden');
+    document.getElementById('avatarRing').classList.replace('border-solid', 'border-dashed');
+    document.getElementById('fileName').classList.add('hidden');
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('uploadZone').classList.add('drag-over');
+  }
+
+  function handleDragLeave(e) {
+    document.getElementById('uploadZone').classList.remove('drag-over');
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('uploadZone').classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      // Set the file on the real input
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      document.getElementById('profileImage').files = dt.files;
+      applyFile(file);
+    }
+  }
+
+  // ── Password visibility toggle ────────────────────────────────────
+  function togglePassword(fieldId, btn) {
+    const input = document.getElementById(fieldId);
+    const icon  = btn.querySelector('.material-symbols-outlined');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.textContent = 'visibility';
+    } else {
+      input.type = 'password';
+      icon.textContent = 'visibility_off';
+    }
+  }
+</script>
+
 </body>
 </html>

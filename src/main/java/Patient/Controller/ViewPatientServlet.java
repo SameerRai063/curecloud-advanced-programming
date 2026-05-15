@@ -1,5 +1,6 @@
 package Patient.Controller;
 
+import Patient.Model.Patient;
 import Patient.Model.dao.PatientDAO;
 import utils.DBConnection;
 
@@ -12,8 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
 
-@WebServlet("/deletePatient")
-public class DeletePatientServlet extends HttpServlet {
+@WebServlet("/viewPatient")
+public class ViewPatientServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -21,7 +22,6 @@ public class DeletePatientServlet extends HttpServlet {
 
         String idParam = request.getParameter("id");
 
-        // Validate id param
         if (idParam == null || idParam.trim().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/patients?error=missing_id");
             return;
@@ -37,17 +37,19 @@ public class DeletePatientServlet extends HttpServlet {
 
         try (Connection con = DBConnection.getConnection()) {
             PatientDAO patientDAO = new PatientDAO(con);
-            boolean deleted = patientDAO.deletePatient(userId);
+            Patient patient = patientDAO.getPatientById(userId);
 
-            if (deleted) {
-                response.sendRedirect(request.getContextPath() + "/patients?success=deleted");
-            } else {
+            if (patient == null) {
                 response.sendRedirect(request.getContextPath() + "/patients?error=not_found");
+                return;
             }
+
+            request.setAttribute("patient", patient);
+            request.getRequestDispatcher("/viewPatient.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/patients?error=delete_failed");
+            response.sendRedirect(request.getContextPath() + "/patients?error=load_failed");
         }
     }
 }
