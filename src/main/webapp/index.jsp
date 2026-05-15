@@ -145,7 +145,7 @@
             <a class="text-[#2F4156] dark:text-slate-400 hover:text-[#567C8D] hover:bg-slate-50 dark:hover:bg-slate-800/50 px-2 py-1 rounded transition-all" href="#">Contact</a>
         </div>
         <div class="flex gap-3">
-            <a href="login.jsp" class="inline-block text-center bg-white text-[#2F4156] border-2 border-[#2F4156] font-semibold px-7 py-3 rounded-full hover:bg-[#e8edf2] active:bg-[#d0d9e3] transition-colors shadow-sm text-lg">
+            <a href="receptionist/index.jsp" class="inline-block text-center bg-white text-[#2F4156] border-2 border-[#2F4156] font-semibold px-7 py-3 rounded-full hover:bg-[#e8edf2] active:bg-[#d0d9e3] transition-colors shadow-sm text-lg">
                 Login
             </a>
             <a href="register.jsp" class="inline-block text-center bg-[#2F4156] text-white font-semibold px-7 py-3 rounded-full hover:bg-[#1e2e3d] active:bg-[#131f2a] transition-colors shadow-lg text-lg">
