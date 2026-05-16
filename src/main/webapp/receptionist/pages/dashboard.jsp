@@ -1,6 +1,22 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="java.util.List" %>
+<%@ page import="Doctor.Model.Doctor" %>
+<%
+  // Fetch stats from request attributes matching your admin/receptionist controllers
+  int totalPatients = (request.getAttribute("totalPatients") != null) ? (Integer) request.getAttribute("totalPatients") : 0;
+  int activeToday = (request.getAttribute("activeToday") != null) ? (Integer) request.getAttribute("activeToday") : 0;
+  int appointmentsToday = (request.getAttribute("appointmentsToday") != null) ? (Integer) request.getAttribute("appointmentsToday") : 0;
+
+  // Fetch doctors list for the sidebar
+  List<Doctor> doctorsList = null;
+  Object docsObj = request.getAttribute("doctorsList");
+  if (docsObj != null) {
+    doctorsList = (List<Doctor>) docsObj;
+  }
+%>
 <%--
-  This is a JSP fragment intended to be injected into index.jsp.
+  JSP FRAGMENT: This is injected into index.jsp.
   It does not need <html> or <body> tags.
 --%>
 <div id="dashboard-root">
@@ -29,7 +45,7 @@
             <span class="material-symbols-outlined text-brand-blue">timer</span>
             Upcoming Appointments
           </h3>
-          <span class="text-[11px] font-bold text-brand-blue bg-blue-50 px-2 py-1 rounded-lg uppercase tracking-wider">Next 4 Hours</span>
+          <span class="text-[11px] font-bold text-brand-blue bg-blue-50 px-2 py-1 rounded-lg uppercase tracking-wider">Recent</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
@@ -66,21 +82,60 @@
 </div>
 
 <script>
-  /**
-   * Bug Fix: window.__pageInit is used by index.jsp to trigger
-   * the rendering after the AJAX content is loaded.
-   */
   window.__pageInit = function() {
 
-    // 1. Render Stats
+    // 1. Seed Recent Appointments using JSTL
+    const fetchedAppointments = [
+      <c:choose>
+        <c:when test="${not empty appointmentList}">
+          <c:forEach var="a" items="${appointmentList}" varStatus="loop">
+          {
+            id:         ${a.id},
+            pid:        `${a.id}`,
+            name:       `${a.patientName}`,
+            doctor:     `${a.doctorName}`,
+            time:       `${a.appointmentTime}`,
+            status:     `${a.status}`
+          }<c:if test="${!loop.last}">,</c:if>
+          </c:forEach>
+        </c:when>
+      </c:choose>
+    ];
+
+    // Fallback to index.jsp array if database returns empty
+    const dashAppointments = fetchedAppointments.length > 0 ? fetchedAppointments : (window.appointments || []);
+
+    // 2. Seed Doctor Status using JSP Scriptlet
+    const fetchedDoctors = [
+      <%
+        if (doctorsList != null && !doctorsList.isEmpty()) {
+          for (int i = 0; i < doctorsList.size(); i++) {
+            Doctor doc = doctorsList.get(i);
+            String docName = (doc.getUser() != null && doc.getUser().getName() != null) ? doc.getUser().getName().replace("'", "&#39;") : "—";
+            String docStatus = (doc.getStatus() != null) ? doc.getStatus() : "Unknown";
+            String color = "active".equalsIgnoreCase(docStatus) ? "bg-mint" : "bg-amber-400";
+      %>
+      {
+        name: `<%= docName %>`,
+        status: `<%= "active".equalsIgnoreCase(docStatus) ? "In Clinic" : docStatus %>`,
+        color: `<%= color %>`
+      }<%= (i < doctorsList.size() - 1) ? "," : "" %>
+      <%
+          }
+        }
+      %>
+    ];
+
+    // 3. Render Stats (Mixing DB stats with JS Fallbacks)
     function renderStats() {
-      // Bug Fix: Check if window.appointments exists to prevent errors
-      const apptCount = (window.appointments && window.appointments.length) ? window.appointments.length : 0;
+      const dbTotalPatients = <%= totalPatients %>;
+      const dbActiveDocs = <%= activeToday %>;
+      const apptCount = dashAppointments.length;
 
       const stats = [
-        { label: 'Total Patients', val: '1,284', icon: 'groups', color: 'text-blue-600', bg: 'bg-blue-50' },
+        { label: 'Total Patients', val: dbTotalPatients > 0 ? dbTotalPatients : '1,284', icon: 'groups', color: 'text-blue-600', bg: 'bg-blue-50' },
         { label: 'Today\'s Visits', val: apptCount, icon: 'calendar_today', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-        { label: 'New Reviews', val: '4', icon: 'star', color: 'text-amber-600', bg: 'bg-amber-50' },
+        { label: 'Active Doctors', val: dbActiveDocs > 0 ? dbActiveDocs : fetchedDoctors.length || '4', icon: 'medical_services', color: 'text-mint', bg: 'bg-teal-50' },
       ];
 
       const container = document.getElementById('dash-stats');
@@ -99,19 +154,18 @@
       }
     }
 
-    // 2. Render Recent Appointments
+    // 4. Render Recent Appointments Table
     function renderRecentAppts() {
       const tbody = document.getElementById('dash-appt-tbody');
       if (!tbody) return;
 
-      // Bug Fix: Handle empty or missing appointments gracefully
-      if (!window.appointments || window.appointments.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-slate-400">No appointments scheduled for today.</td></tr>`;
+      if (!dashAppointments || dashAppointments.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-slate-400">No appointments scheduled.</td></tr>`;
         return;
       }
 
-      const recent = window.appointments.slice(0, 4);
-
+      // Show top 4 upcoming appointments
+      const recent = dashAppointments.slice(0, 4);
       tbody.innerHTML = recent.map(a => {
         const color = window.avatarColor ? window.avatarColor(a.name) : '#CBD5E1';
         const initial = window.initials ? window.initials(a.name) : '??';
@@ -139,18 +193,23 @@
       }).join('');
     }
 
-    // 3. Render Doctor List
+    // 5. Render Doctor Status List
     function renderDoctorStatus() {
       const container = document.getElementById('dash-dr-list');
       if (!container) return;
 
-      const doctors = [
-        { name: 'Dr. Aryan Kapoor', status: 'In Clinic', color: 'bg-mint' },
-        { name: 'Dr. Sneha Reddy', status: 'In Surgery', color: 'bg-amber-400' },
-        { name: 'Dr. Vikram Seth', status: 'On Break', color: 'bg-slate-300' }
-      ];
+      // Use database doctors if present, otherwise inject visual mock data
+      let doctorsToRender = fetchedDoctors;
+      if (doctorsToRender.length === 0) {
+        doctorsToRender = [
+          { name: 'Dr. Aryan Kapoor', status: 'In Clinic', color: 'bg-mint' },
+          { name: 'Dr. Sneha Reddy', status: 'In Surgery', color: 'bg-amber-400' },
+          { name: 'Dr. Vikram Seth', status: 'On Break', color: 'bg-slate-300' }
+        ];
+      }
 
-      container.innerHTML = doctors.map(d => {
+      // Slice to keep sidebar neat
+      container.innerHTML = doctorsToRender.slice(0, 5).map(d => {
         const initial = window.initials ? window.initials(d.name) : 'DR';
         return `
         <div class="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all">
@@ -169,7 +228,7 @@
       }).join('');
     }
 
-    // Execute All Renderers
+    // Execute All Component Renderers
     renderStats();
     renderRecentAppts();
     renderDoctorStatus();
