@@ -185,25 +185,11 @@
         </a>
       </li>
       <li class="nav-item">
-        <a href="<%= request.getContextPath() %>/receptionists" class="nav-link">
-          <i class="fa-solid fa-user-nurse"></i> Receptionists
-        </a>
-      </li>
-      <li class="nav-item">
         <a href="<%= request.getContextPath() %>/appointments" class="nav-link">
           <i class="fa-regular fa-calendar"></i> Appointments
         </a>
       </li>
       <li class="nav-item">
-        <a href="<%= request.getContextPath() %>/billing" class="nav-link">
-          <i class="fa-solid fa-file-invoice-dollar"></i> Billing
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="<%= request.getContextPath() %>/reviews" class="nav-link">
-          <i class="fa-solid fa-star"></i> Reviews
-        </a>
-      </li>
     </ul>
   </div>
 

@@ -1,209 +1,468 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+<%
+    String userName    = (session.getAttribute("userName") != null) ? (String) session.getAttribute("userName") : "Admin";
+    String userRole    = (session.getAttribute("userRole") != null) ? (String) session.getAttribute("userRole") : "Super Admin";
+    String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy"));
+
+    int    totalDoctors       = (request.getAttribute("totalDoctors")       != null) ? (Integer) request.getAttribute("totalDoctors")       : 0;
+    int    totalPatients      = (request.getAttribute("totalPatients")      != null) ? (Integer) request.getAttribute("totalPatients")      : 0;
+    int    totalReceptionists = (request.getAttribute("totalReceptionists") != null) ? (Integer) request.getAttribute("totalReceptionists") : 0;
+    double totalRevenue       = (request.getAttribute("totalRevenue")       != null) ? (Double)  request.getAttribute("totalRevenue")       : 0.0;
+
+    String errorMessage = (String) request.getAttribute("errorMessage");
+%>
 <!DOCTYPE html>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <html lang="en">
 <head>
-    <title>Dashboard — Upachaar</title>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upachaar Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary":            "#0052FF",
-                        "brand-blue":         "#0052FF",
-                        "mint":               "#70C1B3",
-                        "off-white":          "#F7FAFA",
-                        "pending-blue":       "#3b82f6",
-                        "outstanding-orange": "#f59e0b",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"],
-                        "sans":    ["Inter", "sans-serif"],
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg":  "0.5rem",
-                        "xl":  "1rem",
-                        "2xl": "1.5rem",
-                    },
-                },
-            },
+    <style>
+        :root {
+            --primary-blue: #2554ff;
+            --primary-teal: #0d7f6b;
+            --quick-action-teal: #1cb59b;
+            --bg-light: #f8fafc;
+            --text-dark: #111827;
+            --text-gray: #6b7280;
+            --border-color: #e5e7eb;
+            --sidebar-text-muted: #a0bafc;
         }
-    </script>
 
-    <style type="text/tailwindcss">
-        :root { --sidebar-width: 260px; }
-        body  { background-color: #F7FAFA; }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- Sidebar Styles --- */
+        .sidebar { width: 250px; background-color: var(--primary-blue); color: white; display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; }
+        .sidebar-top { padding: 24px 16px; }
+        .brand h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .brand p { font-size: 12px; color: var(--sidebar-text-muted); margin-bottom: 32px; }
+        .nav-menu { list-style: none; }
+        .nav-item { margin-bottom: 4px; }
+        .nav-link { display: flex; align-items: center; padding: 12px 16px; color: white; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 8px; transition: all 0.2s; }
+        .nav-link i { width: 20px; margin-right: 12px; font-size: 16px; text-align: center; }
+        .nav-item.active .nav-link { background-color: white; color: var(--primary-blue); }
+        .nav-link:hover:not(.active) { background-color: rgba(255, 255, 255, 0.1); }
+        .sidebar-bottom { padding: 20px 16px; }
+        .social-links { margin-bottom: 24px; padding: 0 8px; }
+        .social-links p { font-size: 11px; color: var(--sidebar-text-muted); margin-bottom: 8px; }
+        .social-links i { margin-right: 12px; font-size: 14px; cursor: pointer; color: var(--sidebar-text-muted); }
+        .user-profile { display: flex; align-items: center; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .avatar { width: 36px; height: 36px; background-color: white; color: var(--primary-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; margin-right: 12px; text-transform: uppercase; }
+        .user-info h4 { font-size: 13px; font-weight: 600; }
+        .user-info p  { font-size: 11px; color: var(--sidebar-text-muted); }
+
+        /* --- Main Content Styles --- */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { height: 64px; background-color: white; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; flex-shrink: 0; }
+        .topbar-left { font-size: 16px; font-weight: 600; color: var(--primary-teal); }
+        .topbar-right { display: flex; align-items: center; gap: 20px; }
+        .date { font-size: 13px; color: var(--text-gray); }
+        .topbar-icons { display: flex; align-items: center; }
+        .topbar-icons i { font-size: 18px; color: var(--text-gray); margin-left: 16px; cursor: pointer; }
+        .btn-support { background-color: #f0fdf4; color: var(--primary-teal); border: 1px solid #bbf7d0; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 500; cursor: pointer; margin-left: 16px; }
+        .content { padding: 32px; overflow-y: auto; flex: 1; background-color: #fdfdfd; }
+        .page-header { margin-bottom: 24px; }
+        .page-header h2 { font-size: 26px; font-weight: 700; color: #1a202c; margin-bottom: 4px; }
+        .page-header p { font-size: 14px; color: var(--text-gray); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background-color: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; display: flex; justify-content: space-between; align-items: flex-start; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .stat-info h3 { font-size: 13px; font-weight: 500; color: var(--text-gray); margin-bottom: 8px; }
+        .stat-info .value { font-size: 28px; font-weight: 700; color: var(--text-dark); }
+        .stat-icon { color: var(--primary-teal); font-size: 22px; }
+
+        .card { background-color: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; color: #1a202c; }
+
+        /* --- Quick Actions Buttons --- */
+        .quick-actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .btn-quick-action { background-color: var(--quick-action-teal); color: white; border: none; border-radius: 8px; padding: 16px; font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; display: block; transition: background-color 0.2s; }
+        .btn-quick-action:hover { background-color: #16a086; }
+
+        .recent-activity-container { min-height: 150px; display: flex; align-items: center; justify-content: center; color: var(--text-gray); font-size: 14px; }
+        .error-banner { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px 20px; margin-bottom: 20px; font-size: 13px; }
+
+        /* ========================================= */
+        /* MODAL STYLES ADDED HERE                   */
+        /* ========================================= */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);
+            align-items: center; justify-content: center;
         }
-        .page-fade { animation: fadeUp .22s ease both; }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
+        .modal-content {
+            background-color: white; padding: 24px; border-radius: 8px;
+            width: 400px; max-width: 90%; position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
+        .close-btn {
+            position: absolute; top: 16px; right: 16px; font-size: 20px;
+            cursor: pointer; color: var(--text-gray); transition: color 0.2s;
+        }
+        .close-btn:hover { color: var(--text-dark); }
+        .modal-content h3 { margin-bottom: 16px; color: var(--text-dark); }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: var(--text-dark); }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px; border: 1px solid var(--border-color);
+            border-radius: 6px; font-size: 14px; outline: none;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary-blue); }
+        .btn-submit {
+            width: 100%; background-color: var(--primary-blue); color: white;
+            border: none; padding: 12px; border-radius: 6px; font-size: 14px;
+            font-weight: 600; cursor: pointer; transition: background-color 0.2s;
+        }
+        .btn-submit:hover { background-color: #1a40d6; }
     </style>
 </head>
+<body>
 
-<body class="font-display text-slate-900 antialiased">
-<div class="flex h-screen w-full overflow-hidden">
-
-    <aside class="h-screen w-[260px] bg-[#0052FF] text-white shadow-2xl shadow-blue-500/20 flex flex-col py-6 flex-shrink-0">
-        <div class="px-8 mb-10">
-            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Upachaar</h1>
-            <p class="text-[10px] uppercase tracking-widest text-white/60 font-bold">Front Desk Suite</p>
+<aside class="sidebar">
+    <div class="sidebar-top">
+        <div class="brand">
+            <h1>Upachaar</h1>
+            <p>Clinical Oversight</p>
         </div>
-        <nav class="flex-1 flex flex-col gap-1 overflow-y-auto px-0">
-            <a href="dashboard.jsp" class="bg-white text-[#0052FF] rounded-full mx-4 px-4 py-3 font-semibold transition-all duration-200 flex items-center gap-3 shadow-lg shadow-black/10">
-                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">dashboard</span>
-                <span class="text-sm font-medium">Dashboard</span>
-            </a>
-            <a href="doctors.jsp" class="text-white/70 hover:text-white mx-4 px-4 py-3 transition-all duration-200 hover:bg-white/10 rounded-full flex items-center gap-3">
-                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">medical_services</span>
-                <span class="text-sm font-medium">Doctors</span>
-            </a>
-            <a href="patients.jsp" class="text-white/70 hover:text-white mx-4 px-4 py-3 transition-all duration-200 hover:bg-white/10 rounded-full flex items-center gap-3">
-                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">groups</span>
-                <span class="text-sm font-medium">Patients</span>
-            </a>
-            <a href="appointments.jsp" class="text-white/70 hover:text-white mx-4 px-4 py-3 transition-all duration-200 hover:bg-white/10 rounded-full flex items-center gap-3">
-                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">calendar_month</span>
-                <span class="text-sm font-medium">Appointments</span>
-            </a>
-        </nav>
-        <div class="mt-auto p-8 border-t border-white/10">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-full bg-white/20 ring-2 ring-white/30 flex items-center justify-center text-white font-bold text-base flex-shrink-0">PS</div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold text-white truncate">Priya Singh</p>
-                    <p class="text-xs text-white/60 truncate font-medium uppercase tracking-wider">Lead Receptionist</p>
-                </div>
-                <button class="text-white/60 hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">logout</span>
-                </button>
+        <ul class="nav-menu">
+            <li class="nav-item active"><a href="<%= request.getContextPath() %>/Admin-dashboard" class="nav-link"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+            <li class="nav-item"><a href="<%= request.getContextPath() %>/doctors" class="nav-link"><i class="fa-solid fa-stethoscope"></i> Doctors</a></li>
+            <li class="nav-item"><a href="<%= request.getContextPath() %>/patients" class="nav-link"><i class="fa-solid fa-users"></i> Patients</a></li>
+            <li class="nav-item"><a href="<%= request.getContextPath() %>/appointments" class="nav-link"><i class="fa-regular fa-calendar"></i> Appointments</a></li>
+
+        </ul>
+    </div>
+    <div class="sidebar-bottom">
+        <div class="social-links">
+            <p>Follow us</p>
+            <i class="fa-brands fa-facebook-f"></i>
+            <i class="fa-brands fa-twitter"></i>
+            <i class="fa-regular fa-envelope"></i>
+        </div>
+        <div class="user-profile">
+            <div class="avatar"><%= userName.substring(0, 1).toUpperCase() %></div>
+            <div class="user-info">
+                <h4><%= userName %></h4>
+                <p><%= userRole %></p>
             </div>
         </div>
-    </aside>
+    </div>
+</aside>
 
-    <main class="flex-1 flex flex-col overflow-hidden">
-    <header class="h-20 shrink-0 px-10 flex items-center justify-between bg-white border-b border-slate-100 shadow-sm">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-900">Good morning, Priya!</h1>
-            <p class="text-sm text-slate-500">Friday, May 15, 2026 · Front Desk Overview</p>
-        </div>
-        <div class="flex items-center gap-6">
-            <button class="relative text-slate-400 hover:text-slate-600 transition-colors">
-                <span class="material-symbols-outlined text-[28px]">notifications</span>
-                <span class="absolute top-0 right-0 size-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-            <div class="flex items-center gap-3 pl-6 border-l border-slate-200">
-                <div class="text-right">
-                    <p class="text-sm font-bold text-slate-900 leading-none">Priya Singh</p>
-                    <p class="text-xs text-slate-500 mt-0.5">Lead Receptionist</p>
-                </div>
-                <div class="size-10 rounded-full bg-blue-50 flex items-center justify-center text-[#0052FF] font-bold text-sm">PS</div>
+<div class="main-wrapper">
+    <header class="topbar">
+        <div class="topbar-left">Dashboard</div>
+        <div class="topbar-right">
+            <span class="date"><%= currentDate %></span>
+            <div class="topbar-icons">
+                <i class="fa-regular fa-bell"></i>
+                <i class="fa-regular fa-circle-question"></i>
+                <button class="btn-support">Support</button>
             </div>
         </div>
     </header>
 
-        <div class="flex-1 overflow-y-auto px-10 pb-10">
-            <div class="page-fade">
-                <!-- Stats Row -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-8 mb-8">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Today's Appointments</p>
-                        <h3 class="text-3xl font-black text-slate-800">12</h3>
-                        <p class="text-xs text-mint font-semibold mt-1">↑ 3 from yesterday</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Patients Registered</p>
-                        <h3 class="text-3xl font-black text-slate-800">284</h3>
-                        <p class="text-xs text-[#0052FF] font-semibold mt-1">↑ 5 this week</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Doctors On Duty</p>
-                        <h3 class="text-3xl font-black text-slate-800">8</h3>
-                        <p class="text-xs text-slate-400 font-semibold mt-1">2 on leave today</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Pending Messages</p>
-                        <h3 class="text-3xl font-black text-slate-800">3</h3>
-                        <p class="text-xs text-outstanding-orange font-semibold mt-1">Needs attention</p>
-                    </div>
-                </div>
+    <main class="content">
+        <% if (errorMessage != null) { %>
+        <div class="error-banner"><strong>Error:</strong> <%= errorMessage %></div>
+        <% } %>
 
-                <!-- Upcoming Appointments Table -->
-                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-                        <h2 class="font-bold text-slate-800">Today's Schedule</h2>
-                        <a href="appointments.jsp" class="text-xs font-bold text-[#0052FF] uppercase tracking-widest hover:opacity-70 transition-opacity">View All →</a>
-                    </div>
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-[#e2f1ec]">
-                                <th class="px-6 py-4 text-xs font-bold text-[#0b6b59] uppercase tracking-wide">Patient</th>
-                                <th class="px-6 py-4 text-xs font-bold text-[#0b6b59] uppercase tracking-wide">Doctor</th>
-                                <th class="px-6 py-4 text-xs font-bold text-[#0b6b59] uppercase tracking-wide">Time</th>
-                                <th class="px-6 py-4 text-xs font-bold text-[#0b6b59] uppercase tracking-wide">Type</th>
-                                <th class="px-6 py-4 text-xs font-bold text-[#0b6b59] uppercase tracking-wide">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dashboard-table"></tbody>
-                    </table>
-                </div>
+        <div class="page-header">
+            <h2>Welcome, <%= userName %>!</h2>
+            <p>Clinical Oversight Dashboard</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info"><h3>Total Doctors</h3><div class="value"><%= totalDoctors %></div></div>
+                <div class="stat-icon"><i class="fa-solid fa-stethoscope"></i></div>
             </div>
+            <div class="stat-card">
+                <div class="stat-info"><h3>Total Patients</h3><div class="value"><%= totalPatients %></div></div>
+                <div class="stat-icon"><i class="fa-solid fa-user-group"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info"><h3>Total Receptionists</h3><div class="value"><%= totalReceptionists %></div></div>
+                <div class="stat-icon"><i class="fa-solid fa-user-nurse"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info"><h3>Total Revenue</h3><div class="value">NPR <%= String.format("%,.2f", totalRevenue) %></div></div>
+                <div class="stat-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Quick Actions</h3>
+            <div class="quick-actions-grid">
+                <button onclick="openModal('doctorModal')" class="btn-quick-action">Add Doctor</button>
+                <button onclick="openModal('patientModal')" class="btn-quick-action">Add Patient</button>
+                <button onclick="openModal('receptionistModal')" class="btn-quick-action">Add Receptionist</button>
+                <a href="<%= request.getContextPath() %>/billing" class="btn-quick-action">View Billing</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Recent Activity</h3>
+            <div class="recent-activity-container">No recent activity to display</div>
         </div>
     </main>
 </div>
+<div id="doctorModal" class="modal-overlay">
+    <div class="modal-content" style="width: 650px;">
+        <i class="fa-solid fa-xmark close-btn" onclick="closeModal('doctorModal')"></i>
+        <h3>Add New Doctor</h3>
 
-<div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none" id="toast-container"></div>
+        <form action="<%= request.getContextPath() %>/add-doctor" method="POST" enctype="multipart/form-data">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required placeholder="Dr. Samir Rai">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required placeholder="samir@curecloud.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Temporary Password</label>
+                    <input type="password" name="password" required placeholder="Initial Password">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone" required placeholder="+977-XXXXXXXXXX">
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select name="gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob" required>
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Home Address</label>
+                    <input type="text" name="address" required placeholder="Itahari, Koshi Province">
+                </div>
+
+                <div class="form-group">
+                    <label>Department</label>
+                    <select name="department" required>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="General Medicine">General Medicine</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Experience (Years)</label>
+                    <input type="number" name="experienceYears" min="0" required placeholder="e.g. 10">
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Qualifications</label>
+                    <input type="text" name="qualifications" required placeholder="MBBS, MD (Neurology)">
+                </div>
+
+                <%-- UPDATED STATUS DROPDOWN --%>
+                <div class="form-group">
+                    <label>Account Status</label>
+                    <select name="status" required>
+                        <option value="Active">Active</option>
+                        <option value="On Leave">On Leave</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Profile Photo</label>
+                    <input type="file" name="profileImage" accept="image/*">
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit" style="margin-top: 15px;">
+                <i class="fa-solid fa-user-plus"></i> Register Doctor
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="patientModal" class="modal-overlay">
+    <div class="modal-content" style="width: 650px;">
+        <i class="fa-solid fa-xmark close-btn" onclick="closeModal('patientModal')"></i>
+        <h3>Add New Patient</h3>
+
+        <form action="<%= request.getContextPath() %>/add-patient" method="POST" enctype="multipart/form-data">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required placeholder="Jane Doe">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required placeholder="patient@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required placeholder="Password">
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" name="phone" required placeholder="Mobile Number">
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select name="gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob" required>
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Address</label>
+                    <input type="text" name="address" required placeholder="Full Address">
+                </div>
+
+                <div class="form-group">
+                    <label>Blood Group</label>
+                    <select name="bloodGroup" required>
+                        <option value="" disabled selected>Select Blood Group</option>
+                        <option value="A+">A+</option><option value="A-">A-</option>
+                        <option value="B+">B+</option><option value="B-">B-</option>
+                        <option value="O+">O+</option><option value="O-">O-</option>
+                        <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Profile Image (Optional)</label>
+                    <input type="file" name="profileImage" accept="image/*">
+                </div>
+
+            </div>
+            <button type="submit" class="btn-submit" style="margin-top: 15px;">Add Patient</button>
+        </form>
+    </div>
+</div>
+
+<div id="receptionistModal" class="modal-overlay">
+    <div class="modal-content" style="width: 650px;">
+        <i class="fa-solid fa-xmark close-btn" onclick="closeModal('receptionistModal')"></i>
+        <h3>Add New Receptionist</h3>
+
+        <form action="<%= request.getContextPath() %>/add-receptionist" method="POST" enctype="multipart/form-data">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required placeholder="Jane Smith">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required placeholder="frontdesk@curecloud.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Temporary Password</label>
+                    <input type="password" name="password" required placeholder="Initial Password">
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" name="phone" required placeholder="+977-XXXXXXXXXX">
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select name="gender" required>
+                        <option value="" disabled selected>Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob" required>
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Home Address</label>
+                    <input type="text" name="address" required placeholder="Full Address">
+                </div>
+
+                <div class="form-group">
+                    <label>Account Status</label>
+                    <select name="status" required>
+                        <option value="Active" selected>Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Profile Image (Optional)</label>
+                    <input type="file" name="profileImage" accept="image/*">
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit" style="margin-top: 15px;">
+                <i class="fa-solid fa-user-plus"></i> Register Receptionist
+            </button>
+        </form>
+    </div>
+</div>
 
 <script>
-    const COLORS = ['#0052FF','#70C1B3','#f59e0b','#f43f5e','#8B5CF6','#3b82f6','#EC4899'];
-    function initials(n){ return n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
-    function avatarColor(n){ let h=0; for(let c of n) h=c.charCodeAt(0)+((h<<5)-h); return COLORS[Math.abs(h)%COLORS.length]; }
-
-    function toast(msg) {
-        const c = document.getElementById('toast-container');
-        const el = document.createElement('div');
-        el.className = 'flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl text-sm font-medium border-l-4 border-[#0052FF] pointer-events-auto';
-        el.innerHTML = `<span class="material-symbols-outlined text-[#0052FF] text-[18px]">check_circle</span><span>${msg}</span>`;
-        c.appendChild(el);
-        setTimeout(() => el.remove(), 3500);
+    // Open a specific modal
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'flex';
     }
 
-    const appointments = [
-        {name:'Priya Sharma',  doctor:'Dr. A. Kapoor', time:'09:00 AM', type:'Follow-up',       status:'upcoming'},
-        {name:'Rohan Mehta',   doctor:'Dr. A. Kapoor', time:'10:30 AM', type:'Consultation',    status:'pending'},
-        {name:'Anjali Verma',  doctor:'Dr. S. Reddy',  time:'12:00 PM', type:'Routine Checkup', status:'completed'},
-        {name:'Karan Patel',   doctor:'Dr. S. Reddy',  time:'02:15 PM', type:'Report Review',   status:'upcoming'},
-    ];
-    const statusCls = {
-        upcoming:  'bg-blue-50 text-blue-600',
-        pending:   'bg-amber-50 text-amber-600',
-        completed: 'bg-emerald-50 text-emerald-700',
-    };
-    const tbody = document.getElementById('dashboard-table');
-    tbody.innerHTML = appointments.map(a => `
-        <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 text-sm font-semibold text-slate-800">${a.name}</td>
-            <td class="px-6 py-4 text-sm text-slate-600">${a.doctor}</td>
-            <td class="px-6 py-4 text-sm text-slate-600 font-mono">${a.time}</td>
-            <td class="px-6 py-4 text-sm text-slate-600">${a.type}</td>
-            <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-bold capitalize ${statusCls[a.status] || ''}">${a.status}</span></td>
-        </tr>`).join('');
+    // Close a specific modal
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Close the modal if the user clicks anywhere outside of the white modal box
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            event.target.style.display = 'none';
+        }
+    }
 </script>
+
 </body>
 </html>
