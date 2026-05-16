@@ -115,7 +115,7 @@
         <a href="${pageContext.request.contextPath}/appointments" class="nav-link">
           <i class="fa-regular fa-calendar"></i> Appointments</a></li>
       <li class="nav-item">
-        <a href="billing.jsp" class="nav-link">
+        <a href="${pageContext.request.contextPath}/billing" class="nav-link">
           <i class="fa-solid fa-file-invoice-dollar"></i> Billing</a></li>
       <li class="nav-item">
         <a href="<%= request.getContextPath() %>/reviews" class="nav-link">
