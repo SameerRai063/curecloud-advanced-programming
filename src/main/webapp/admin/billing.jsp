@@ -165,7 +165,7 @@
           <th>METHOD</th>
           <th>DATE</th>
           <th>STATUS</th>
-          <th>ACTIONS</th>
+
         </tr>
         </thead>
         <tbody>
@@ -178,29 +178,14 @@
           <c:otherwise>
             <c:forEach var="bill" items="${billingList}">
               <tr>
-                <td>${bill.pidx}</td>
-                <td>${bill.patientName}</td>
-                <td>${bill.serviceId}</td>
+                <td>${bill.id}</td>                                          <%-- was bill.pidx --%>
+                <td>${bill.patient.user.name}</td>                           <%-- was bill.patientName --%>
+                <td>${bill.appointmentId}</td>                               <%-- was bill.serviceId --%>
                 <td>NPR <fmt:formatNumber value="${bill.amount}" pattern="#,##0.00" /></td>
-                <td>${bill.method}</td>
-                <td>${bill.date}</td>
-                <td>
-                  <c:choose>
-                    <c:when test="${bill.status == 'PAID' || bill.status == 'Paid'}">
-                      <span class="badge badge-paid">Paid</span>
-                    </c:when>
-                    <c:when test="${bill.status == 'PENDING' || bill.status == 'Pending'}">
-                      <span class="badge badge-pending">Pending</span>
-                    </c:when>
-                    <c:otherwise>
-                      <span class="badge badge-failed">${bill.status}</span>
-                    </c:otherwise>
-                  </c:choose>
-                </td>
-                <td>
-                  <a href="viewInvoice.jsp?id=${bill.pidx}" class="action-icon" title="View"><i class="fa-solid fa-eye"></i></a>
-                  <a href="printInvoice.jsp?id=${bill.pidx}" class="action-icon" title="Print"><i class="fa-solid fa-print"></i></a>
-                </td>
+                <td>—</td>                                                   <%-- no method in Payment model --%>
+                <td>${bill.createdAt}</td>                                   <%-- was bill.date --%>
+                <td><span class="badge badge-paid">Paid</span></td>          <%-- no status in Payment model --%>
+
               </tr>
             </c:forEach>
           </c:otherwise>

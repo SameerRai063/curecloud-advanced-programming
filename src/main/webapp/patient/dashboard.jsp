@@ -130,9 +130,16 @@
                         <div class="bg-white/20 size-12 rounded-xl flex items-center justify-center">
                             <span class="material-symbols-outlined">support_agent</span>
                         </div>
-                        <div>
-                            <p class="text-white/80 text-xs font-medium mb-1">Help & Support</p>
-                            <p class="text-lg font-bold leading-tight">Customer Service</p>
+                        <%-- Feedback Trigger Card --%>
+                        <div class="bg-mint p-6 rounded-2xl shadow-lg shadow-mint/10 flex flex-col justify-between h-44 text-white hover:-translate-y-1 transition-transform cursor-pointer"
+                             onclick="document.getElementById('feedbackModal').classList.remove('hidden')">
+                            <div class="bg-white/20 size-12 rounded-xl flex items-center justify-center">
+                                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span>
+                            </div>
+                            <div>
+                                <p class="text-white/80 text-xs font-medium mb-1">Rate us</p>
+                                <p class="text-lg font-bold leading-tight">Provide Feedback</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -163,6 +170,93 @@
         </div>
     </main>
 </div>
+<%-- Feedback Modal — outside all containers --%>
+<div id="feedbackModal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center">
 
+    <%-- Backdrop --%>
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"
+         onclick="document.getElementById('feedbackModal').classList.add('hidden')"></div>
+
+    <%-- Modal Box --%>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8 z-10">
+
+        <%-- Header --%>
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-lg font-bold text-slate-800">Leave Feedback</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Your opinion helps us improve.</p>
+            </div>
+            <button onclick="document.getElementById('feedbackModal').classList.add('hidden')"
+                    class="text-slate-400 hover:text-slate-600 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <%-- Form --%>
+        <form method="post" action="<%= request.getContextPath() %>/submitFeedback">
+
+            <%-- Star Rating --%>
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-slate-700 mb-3">Rating</label>
+                <div class="flex gap-2">
+                    <c:forEach begin="1" end="5" var="i">
+                        <button type="button"
+                                onclick="setRating(${i})"
+                                class="star-btn text-3xl text-slate-300 hover:text-yellow-400 transition-colors"
+                                data-value="${i}">
+                            &#9733;
+                        </button>
+                    </c:forEach>
+                </div>
+                <input type="hidden" name="rating" id="ratingInput" value="0" />
+                <p id="ratingError" class="text-xs text-red-500 mt-1 hidden">Please select a rating.</p>
+            </div>
+
+            <%-- Comment --%>
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Comment</label>
+                <textarea name="comment" rows="4" required
+                          placeholder="Tell us about your experience..."
+                          class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue resize-none transition"></textarea>
+            </div>
+
+            <%-- Buttons --%>
+            <div class="flex gap-3">
+                <button type="button"
+                        onclick="document.getElementById('feedbackModal').classList.add('hidden')"
+                        class="flex-1 border border-slate-200 text-slate-600 text-sm font-semibold py-2.5 rounded-xl hover:bg-slate-50 transition">
+                    Cancel
+                </button>
+                <button type="submit"
+                        onclick="return validateFeedback()"
+                        class="flex-1 bg-brand-blue text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-700 transition">
+                    Submit
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    function setRating(value) {
+        document.getElementById('ratingInput').value = value;
+        document.querySelectorAll('.star-btn').forEach(btn => {
+            btn.style.color = parseInt(btn.dataset.value) <= value ? '#facc15' : '#cbd5e1';
+        });
+    }
+
+    function validateFeedback() {
+        const rating = document.getElementById('ratingInput').value;
+        if (rating === '0') {
+            document.getElementById('ratingError').classList.remove('hidden');
+            return false;
+        }
+        return true;
+    }
+</script>
+
+</body>
+</html>
 </body>
 </html>

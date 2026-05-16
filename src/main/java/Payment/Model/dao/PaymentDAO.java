@@ -34,7 +34,7 @@ public class PaymentDAO implements PaymentInterface {
         String sql = "SELECT p.id, p.patient_id, p.appointment_id, p.amount, p.created_at, " +
                 "u.id AS user_id, u.name " +
                 "FROM payments p " +
-                "JOIN patients pt ON p.patient_id = pt.user_id " +
+                "JOIN patient pt ON p.patient_id = pt.user_id " +
                 "JOIN users u ON pt.user_id = u.id " +
                 "ORDER BY p.created_at DESC";
 
