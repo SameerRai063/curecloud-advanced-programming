@@ -79,14 +79,11 @@ public class RegisterPatientServlet extends HttpServlet {
                 filePart.write(uploadPath + File.separator + fileName);
             }
 
-            // Hash password
-            String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
-
-            // Build User
+            // Build User (DO NOT hash here; DAO will handle password hashing)
             User user = new User();
             user.setName(name);
             user.setEmail(email);
-            user.setPassword(hashedPassword);
+            user.setPassword(plainPassword);
             user.setPhone(phone);
             user.setGender(gender);
             user.setAddress(address);
@@ -115,8 +112,12 @@ public class RegisterPatientServlet extends HttpServlet {
             forwardWithError(request, response, e.getMessage());
 
         } catch (Exception e) {
-            e.printStackTrace();
-            forwardWithError(request, response, "A server error occurred. Please try again.");
+            System.err.println("=== REGISTRATION ERROR ===");
+            System.err.println("Exception: " + e.getClass().getName());
+            System.err.println("Message: " + e.getMessage());
+            e.printStackTrace(System.err);
+            System.err.println("========================");
+            forwardWithError(request, response, "A server error occurred: " + e.getMessage());
 
         } finally {
             try { if (con != null) con.close(); } catch (Exception ignore) {}
