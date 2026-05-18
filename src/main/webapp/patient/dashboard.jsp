@@ -70,6 +70,11 @@
                 <span class="material-symbols-outlined">settings</span>
                 <span class="text-sm font-medium">Settings</span>
             </a>
+            <a class="text-white/70 hover:text-white mx-4 px-4 py-3 transition-all duration-200 hover:bg-white/10 rounded-full flex items-center gap-3"
+               href="${pageContext.request.contextPath}/patient/chat">
+                <span class="material-symbols-outlined">chat</span>
+                <span class="text-sm font-medium">Chat</span>
+            </a>
         </nav>
     </aside>
 

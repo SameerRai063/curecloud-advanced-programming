@@ -138,6 +138,7 @@
             <li class="nav-item"><a href="<%= request.getContextPath() %>/receptionists/doctors" class="nav-link"><i class="fa-solid fa-stethoscope"></i> Doctors</a></li>
             <li class="nav-item"><a href="<%= request.getContextPath() %>/receptionists/patients" class="nav-link"><i class="fa-solid fa-users"></i> Patients</a></li>
             <li class="nav-item"><a href="<%= request.getContextPath() %>/receptionists/appointments" class="nav-link"><i class="fa-regular fa-calendar"></i> Appointments</a></li>
+            <li class="nav-item"><a href="<%= request.getContextPath() %>/receptionist/chat" class="nav-link"><i class="fa-solid fa-comments"></i> Chat</a></li>
 
         </ul>
     </div>
