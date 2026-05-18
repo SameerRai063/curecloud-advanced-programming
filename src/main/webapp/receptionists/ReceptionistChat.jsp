@@ -5,6 +5,27 @@
     <meta charset="utf-8" />
     <title>Receptionist Chat</title>
     <script>
+        // WebSocket client for receptionist
+        let chatWs = null;
+        function initWs() {
+            const senderId = document.getElementById('senderId').value;
+            if (!senderId) return;
+            const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+            const url = protocol + '://' + location.host + '<%=request.getContextPath()%>/ws/chat?userId=' + encodeURIComponent(senderId);
+            chatWs = new WebSocket(url);
+            chatWs.onmessage = function (ev) {
+                try {
+                    const obj = JSON.parse(ev.data);
+                    const list = document.getElementById('messages');
+                    const li = document.createElement('li');
+                    li.textContent = obj.senderName + ': ' + obj.message;
+                    list.appendChild(li);
+                } catch (e) { console.error(e); }
+            };
+            chatWs.onopen = function() { console.log('Chat WS open'); };
+            chatWs.onclose = function() { console.log('Chat WS closed'); };
+        }
+
         async function sendMessage() {
             const senderId = document.getElementById('senderId').value;
             const receiverId = document.getElementById('receiverId').value;
@@ -13,14 +34,24 @@
             const senderRole = 'receptionist';
             const message = document.getElementById('message').value;
 
-            const form = new URLSearchParams();
-            form.append('senderId', senderId);
-            form.append('receiverId', receiverId);
-            form.append('senderName', senderName);
-            form.append('receiverName', receiverName);
-            form.append('senderRole', senderRole);
-            form.append('message', message);
+            const payload = {
+                senderId: parseInt(senderId||0),
+                receiverId: parseInt(receiverId||0),
+                senderName: senderName || '',
+                receiverName: receiverName || '',
+                senderRole: senderRole,
+                message: message || ''
+            };
 
+            if (chatWs && chatWs.readyState === WebSocket.OPEN) {
+                chatWs.send(JSON.stringify(payload));
+                document.getElementById('message').value = '';
+                return;
+            }
+
+            // fallback to HTTP POST
+            const form = new URLSearchParams();
+            Object.keys(payload).forEach(k => form.append(k, payload[k]));
             const res = await fetch('<%=request.getContextPath()%>/sendMessage', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
@@ -37,6 +68,8 @@
                 alert('Send failed');
             }
         }
+
+        window.addEventListener('load', initWs);
     </script>
 </head>
 <body>
