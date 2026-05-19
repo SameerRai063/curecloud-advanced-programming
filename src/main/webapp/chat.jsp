@@ -167,14 +167,22 @@
             return;
         }
 
-        fetch('${pageContext.request.contextPath}/getMessages?senderId=' + encodeURIComponent(senderId) + '&receiverId=' + encodeURIComponent(receiverId) + '&_=' + Date.now(), {
+        fetch('${pageContext.request.contextPath}/chat?fragment=messages&senderId=' + encodeURIComponent(senderId) + '&receiverId=' + encodeURIComponent(receiverId) + '&_=' + Date.now(), {
             cache: 'no-store'
         })
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Unable to load messages');
+                }
+                return response.text();
+            })
             .then(data => {
                 chatBox.innerHTML = data || '<div class="text-sm text-slate-500">No messages yet.</div>';
                 chatBox.scrollTop = chatBox.scrollHeight;
                 loadContactsList();
+            })
+            .catch(() => {
+                chatBox.innerHTML = '<div class="text-sm text-red-500">Unable to load messages.</div>';
             });
     }
 
@@ -203,10 +211,15 @@
 
     // Periodically refresh contacts list (to update unread badges and ordering)
     function loadContactsList() {
-        fetch('${pageContext.request.contextPath}/getContacts?receiverId=' + encodeURIComponent(receiverId) + '&_=' + Date.now(), {
+        fetch('${pageContext.request.contextPath}/chat?fragment=contacts&receiverId=' + encodeURIComponent(receiverId) + '&_=' + Date.now(), {
             cache: 'no-store'
         })
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Unable to load contacts');
+                }
+                return response.text();
+            })
             .then(html => {
                 document.getElementById('contactsList').innerHTML = html;
             })

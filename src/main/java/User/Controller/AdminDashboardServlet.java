@@ -12,9 +12,13 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet("/Admin-dashboard")
 public class AdminDashboardServlet extends HttpServlet {
+
+    private static final Logger LOGGER = Logger.getLogger(AdminDashboardServlet.class.getName());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -27,10 +31,7 @@ public class AdminDashboardServlet extends HttpServlet {
             return;
         }
 
-        Connection con = null;
-
-        try {
-            con = DBConnection.getConnection();
+        try (Connection con = DBConnection.getConnection()) {
 
             // Instantiate DAOs
             DoctorDAO       doctorDAO       = new DoctorDAO(con);
@@ -51,21 +52,17 @@ public class AdminDashboardServlet extends HttpServlet {
             request.setAttribute("totalRevenue",       totalRevenue);
             DashboardActivityService.attachRecentActivity(con, request);
 
-            // Forward to dashboard JSP
-            RequestDispatcher rd = request.getRequestDispatcher("/admin/dashboard.jsp");
-            rd.forward(request, response);
-
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Unable to load admin dashboard", e);
             request.setAttribute("errorMessage", e.getMessage());
-            request.getRequestDispatcher("/admin/dashboard.jsp").forward(request, response);
-
-        } finally {
-            try {
-                if (con != null) con.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
+
+        forwardDashboard(request, response);
+    }
+
+    private void forwardDashboard(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        RequestDispatcher rd = request.getRequestDispatcher("/admin/dashboard.jsp");
+        rd.forward(request, response);
     }
 }
