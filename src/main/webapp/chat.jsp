@@ -81,13 +81,14 @@
                     <p class="text-sm text-slate-500">Patient and receptionist communication</p>
                 </div>
                 <div class="flex items-center gap-3">
+                    <a href="${pageContext.request.contextPath}/notifications.jsp"
+                       class="relative inline-flex size-11 items-center justify-center rounded-full bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-blue-50 hover:text-[#0052FF] transition-colors"
+                       aria-label="Notifications">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span id="notificationBadge"
+                              class="absolute -right-1 -top-1 hidden min-w-5 rounded-full bg-red-500 px-1.5 py-0.5 text-center text-[10px] font-bold leading-none text-white"></span>
+                    </a>
                     <c:if test="${sessionScope.userRole eq 'patient'}">
-                        <a href="${pageContext.request.contextPath}/notifications.jsp"
-                           class="relative inline-flex size-11 items-center justify-center rounded-full bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-blue-50 hover:text-[#0052FF] transition-colors"
-                           aria-label="Notifications">
-                            <span class="material-symbols-outlined">notifications</span>
-                            <span class="absolute right-2 top-2 size-2 rounded-full bg-red-500"></span>
-                        </a>
                         <div class="flex items-center gap-3 border-l border-slate-200 pl-5">
                             <span class="text-sm font-bold text-slate-900">${sessionScope.userName}</span>
                             <a href="${pageContext.request.contextPath}/patientProfile"
@@ -162,6 +163,7 @@
     const chatBox = document.getElementById('chatBox');
     const form = document.getElementById('chatForm');
     const messageInput = document.getElementById('message');
+    const notificationBadge = document.getElementById('notificationBadge');
 
     function loadMessages() {
         if (!receiverId || receiverId === '0') {
@@ -197,17 +199,41 @@
             return;
         }
 
+        messageInput.disabled = true;
         fetch(BASE + '/sendMessage', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'senderId=' + encodeURIComponent(senderId)
                 + '&receiverId=' + encodeURIComponent(receiverId)
                 + '&message=' + encodeURIComponent(message)
-        }).then(() => {
-            messageInput.value = '';
-            loadContactsList();
-            loadMessages();
-        });
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text || 'Unable to send message');
+                    });
+                }
+                return response.text();
+            })
+            .then(html => {
+                messageInput.value = '';
+                if (html) {
+                    chatBox.innerHTML = chatBox.innerHTML.replace('<div class="text-sm text-slate-500">No messages yet.</div>', '');
+                    chatBox.innerHTML += html;
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+                loadContactsList();
+                loadMessages();
+            })
+            .catch(error => {
+                console.error('Failed to send message', error);
+                chatBox.innerHTML += '<div class="text-sm text-red-500">Unable to send message. Please try again.</div>';
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .finally(() => {
+                messageInput.disabled = false;
+                messageInput.focus();
+            });
     });
 
     loadMessages();
@@ -237,6 +263,34 @@
 
     loadContactsList();
     setInterval(loadContactsList, 1500);
+
+    function loadNotificationCount() {
+        fetch(BASE + '/notificationCount?_=' + Date.now(), {
+            cache: 'no-store'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Unable to load notification count');
+                }
+                return response.text();
+            })
+            .then(text => {
+                const count = Number.parseInt(text, 10) || 0;
+                if (count > 0) {
+                    notificationBadge.textContent = count > 99 ? '99+' : String(count);
+                    notificationBadge.classList.remove('hidden');
+                } else {
+                    notificationBadge.textContent = '';
+                    notificationBadge.classList.add('hidden');
+                }
+            })
+            .catch(() => {
+                notificationBadge.classList.add('hidden');
+            });
+    }
+
+    loadNotificationCount();
+    setInterval(loadNotificationCount, 5000);
 
     // Polling already keeps chat and unread badges fresh without requiring WebSocket support.
 </script>

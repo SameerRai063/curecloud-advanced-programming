@@ -527,4 +527,13 @@
         <url-pattern>/markAllNotificationsRead</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>notificationCount</servlet-name>
+        <servlet-class>Notification.Controller.NotificationCountServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>notificationCount</servlet-name>
+        <url-pattern>/notificationCount</url-pattern>
+    </servlet-mapping>
+
 </web-app>

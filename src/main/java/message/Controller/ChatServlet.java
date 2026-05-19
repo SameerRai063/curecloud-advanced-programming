@@ -87,8 +87,9 @@ public class ChatServlet extends HttpServlet {
         try (Connection conn = DBConnection.getConnection()) {
             List<ContactRow> contacts = loadContactRows(conn, role, contactRole, senderId, activeReceiverId);
             contacts.sort(Comparator
-                    .comparingInt(ContactRow::getUnreadCount).reversed()
+                    .comparing(ContactRow::hasUnread).reversed()
                     .thenComparing(ContactRow::getLastMessageAt, Comparator.nullsLast(Comparator.reverseOrder()))
+                    .thenComparing(ContactRow::getUnreadCount, Comparator.reverseOrder())
                     .thenComparing(ContactRow::getName, String.CASE_INSENSITIVE_ORDER));
 
             StringBuilder sb = new StringBuilder();
@@ -204,10 +205,9 @@ public class ChatServlet extends HttpServlet {
 
     private List<Contact> loadContacts(Connection conn, String role) throws Exception {
         List<Contact> contacts = new ArrayList<>();
-        String sql = "SELECT id, name FROM users WHERE role = ? ORDER BY name";
+        String sql = contactSql(role);
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, role);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int contactId = rs.getInt("id");
@@ -222,10 +222,9 @@ public class ChatServlet extends HttpServlet {
 
     private List<ContactRow> loadContactRows(Connection conn, String role, String contactRole, int senderId, int activeReceiverId) throws Exception {
         List<ContactRow> contacts = new ArrayList<>();
-        String sql = "SELECT id, name FROM users WHERE role = ? ORDER BY name";
+        String sql = contactSql(contactRole);
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, contactRole);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int contactId = rs.getInt("id");
@@ -237,6 +236,18 @@ public class ChatServlet extends HttpServlet {
         }
 
         return contacts;
+    }
+
+    private String contactSql(String role) {
+        if ("receptionist".equalsIgnoreCase(role)) {
+            return "SELECT u.id, u.name FROM users u JOIN receptionist r ON r.user_id = u.id " +
+                    "WHERE u.role = 'receptionist' ORDER BY u.name";
+        }
+        if ("patient".equalsIgnoreCase(role)) {
+            return "SELECT u.id, u.name FROM users u JOIN patient p ON p.user_id = u.id " +
+                    "WHERE u.role = 'patient' ORDER BY u.name";
+        }
+        return "SELECT id, name FROM users WHERE role = '' ORDER BY name";
     }
 
     private void appendContactRow(StringBuilder sb, HttpServletRequest request, ContactRow contact) {
@@ -320,7 +331,7 @@ public class ChatServlet extends HttpServlet {
         int unread = 0;
         if (hasReceiverId) {
             String unreadSql = "SELECT COUNT(*) FROM conversations c JOIN messages m ON m.conversation_id = c.id " +
-                    "WHERE c.patient_id = ? AND m.sender_id = ? AND m.receiver_id = ? AND m.is_read = 0";
+                    "WHERE c.patient_id = ? AND m.sender_id = ? AND (m.receiver_id = ? OR m.receiver_id IS NULL) AND m.is_read = 0";
             try (PreparedStatement ups = conn.prepareStatement(unreadSql)) {
                 ups.setInt(1, patientId);
                 ups.setInt(2, contactId);
@@ -456,6 +467,7 @@ public class ChatServlet extends HttpServlet {
         public String getLastMessagePreview() { return lastMessagePreview; }
         public Timestamp getLastMessageAt() { return lastMessageAt; }
         public boolean isActive() { return active; }
+        public boolean hasUnread() { return unreadCount > 0; }
         public String getInitial() { return name.trim().isEmpty() ? "?" : name.trim().substring(0, 1).toUpperCase(); }
     }
 

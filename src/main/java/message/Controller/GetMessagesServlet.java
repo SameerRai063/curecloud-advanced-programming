@@ -69,7 +69,8 @@ public class GetMessagesServlet extends HttpServlet {
                         "FROM messages m " +
                         "JOIN conversations c ON c.id = m.conversation_id " +
                         "WHERE c.patient_id = ? " +
-                        "AND ((m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?)) " +
+                        "AND ((m.sender_id = ? AND (m.receiver_id = ? OR m.receiver_id IS NULL)) " +
+                        "OR (m.sender_id = ? AND (m.receiver_id = ? OR m.receiver_id IS NULL))) " +
                         "ORDER BY m.sent_at ASC";
 
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {

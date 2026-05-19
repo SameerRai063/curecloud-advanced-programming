@@ -32,9 +32,8 @@ public class GetContactsServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         try (Connection conn = DBConnection.getConnection()) {
-            String sql = "SELECT id, name FROM users WHERE role = ? ORDER BY name";
+            String sql = contactSql(contactRole);
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, contactRole);
                 try (ResultSet rs = ps.executeQuery()) {
                     List<ContactRow> contacts = new ArrayList<>();
                     while (rs.next()) {
@@ -47,8 +46,9 @@ public class GetContactsServlet extends HttpServlet {
                     }
 
                     contacts.sort(Comparator
-                            .comparingInt(ContactRow::getUnreadCount).reversed()
+                            .comparing(ContactRow::hasUnread).reversed()
                             .thenComparing(ContactRow::getLastMessageAt, Comparator.nullsLast(Comparator.reverseOrder()))
+                            .thenComparing(ContactRow::getUnreadCount, Comparator.reverseOrder())
                             .thenComparing(ContactRow::getName, String.CASE_INSENSITIVE_ORDER));
 
                     StringBuilder sb = new StringBuilder();
@@ -87,6 +87,18 @@ public class GetContactsServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to load contacts: " + e.getMessage());
             log("Unable to load contacts", e);
         }
+    }
+
+    private String contactSql(String role) {
+        if ("receptionist".equalsIgnoreCase(role)) {
+            return "SELECT u.id, u.name FROM users u JOIN receptionist r ON r.user_id = u.id " +
+                    "WHERE u.role = 'receptionist' ORDER BY u.name";
+        }
+        if ("patient".equalsIgnoreCase(role)) {
+            return "SELECT u.id, u.name FROM users u JOIN patient p ON p.user_id = u.id " +
+                    "WHERE u.role = 'patient' ORDER BY u.name";
+        }
+        return "SELECT id, name FROM users WHERE role = '' ORDER BY name";
     }
 
     private void appendContactRow(StringBuilder sb, HttpServletRequest request, ContactRow contact) {
@@ -148,7 +160,7 @@ public class GetContactsServlet extends HttpServlet {
         int unread = 0;
         if (hasReceiverId) {
             String unreadSql = "SELECT COUNT(*) FROM conversations c JOIN messages m ON m.conversation_id = c.id " +
-                    "WHERE c.patient_id = ? AND m.sender_id = ? AND m.receiver_id = ? AND m.is_read = 0";
+                    "WHERE c.patient_id = ? AND m.sender_id = ? AND (m.receiver_id = ? OR m.receiver_id IS NULL) AND m.is_read = 0";
             try (PreparedStatement ups = conn.prepareStatement(unreadSql)) {
                 ups.setInt(1, patientId);
                 ups.setInt(2, contactId);
@@ -174,7 +186,8 @@ public class GetContactsServlet extends HttpServlet {
         if (hasReceiverId) {
             String lastMessageSql = "SELECT m.message_text, m.sent_at FROM messages m " +
                     "JOIN conversations c ON c.id = m.conversation_id " +
-                    "WHERE c.patient_id = ? AND ((m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?)) " +
+                    "WHERE c.patient_id = ? AND ((m.sender_id = ? AND (m.receiver_id = ? OR m.receiver_id IS NULL)) " +
+                    "OR (m.sender_id = ? AND (m.receiver_id = ? OR m.receiver_id IS NULL))) " +
                     "ORDER BY m.sent_at DESC, m.id DESC LIMIT 1";
             try (PreparedStatement lps = conn.prepareStatement(lastMessageSql)) {
                 lps.setInt(1, patientId);
@@ -242,6 +255,7 @@ public class GetContactsServlet extends HttpServlet {
         public String getLastMessagePreview() { return lastMessagePreview; }
         public Timestamp getLastMessageAt() { return lastMessageAt; }
         public boolean isActive() { return active; }
+        public boolean hasUnread() { return unreadCount > 0; }
         public String getInitial() { return name.trim().isEmpty() ? "?" : name.trim().substring(0, 1).toUpperCase(); }
     }
 }

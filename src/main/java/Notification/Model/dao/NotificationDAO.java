@@ -23,8 +23,17 @@ public class NotificationDAO {
     }
 
     public void addNotificationForRole(String role, String title, String message) throws Exception {
-        String sql = "INSERT INTO notifications (user_id, title, message) " +
-                "SELECT id, ?, ? FROM users WHERE role = ?";
+        String sql;
+        if ("receptionist".equalsIgnoreCase(role)) {
+            sql = "INSERT INTO notifications (user_id, title, message) " +
+                    "SELECT u.id, ?, ? FROM users u JOIN receptionist r ON r.user_id = u.id WHERE u.role = ?";
+        } else if ("patient".equalsIgnoreCase(role)) {
+            sql = "INSERT INTO notifications (user_id, title, message) " +
+                    "SELECT u.id, ?, ? FROM users u JOIN patient p ON p.user_id = u.id WHERE u.role = ?";
+        } else {
+            sql = "INSERT INTO notifications (user_id, title, message) " +
+                    "SELECT id, ?, ? FROM users WHERE role = ?";
+        }
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

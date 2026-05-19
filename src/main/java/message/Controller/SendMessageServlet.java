@@ -60,6 +60,12 @@ public class SendMessageServlet extends HttpServlet {
         }
 
         try (Connection conn = DBConnection.getConnection()) {
+            if (!isAllowedChatPair(conn, senderId, receiverId)) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        "Chat is only available between patients and receptionists");
+                return;
+            }
+
             int conversationId = findOrCreateConversation(conn, senderId, receiverId);
 
             if (hasReceiverIdColumn(conn)) {
@@ -89,12 +95,38 @@ public class SendMessageServlet extends HttpServlet {
                 e.printStackTrace();
             }
 
-            response.getWriter().print("Message sent");
+            response.setContentType("text/html;charset=UTF-8");
+            response.getWriter().print(renderOwnMessage(message));
 
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Unable to store message: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private boolean isAllowedChatPair(Connection conn, int senderId, int receiverId) throws Exception {
+        return (isPatient(conn, senderId) && isReceptionist(conn, receiverId))
+                || (isReceptionist(conn, senderId) && isPatient(conn, receiverId));
+    }
+
+    private boolean isPatient(Connection conn, int userId) throws Exception {
+        String sql = "SELECT 1 FROM users u JOIN patient p ON p.user_id = u.id WHERE u.id = ? AND u.role = 'patient'";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    private boolean isReceptionist(Connection conn, int userId) throws Exception {
+        String sql = "SELECT 1 FROM users u JOIN receptionist r ON r.user_id = u.id WHERE u.id = ? AND u.role = 'receptionist'";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
         }
     }
 
@@ -112,7 +144,10 @@ public class SendMessageServlet extends HttpServlet {
             }
         }
 
-        String insertSql = "INSERT INTO conversations(patient_id) VALUES(?)";
+        boolean legacyDoctorColumn = hasConversationDoctorIdColumn(conn);
+        String insertSql = legacyDoctorColumn
+                ? "INSERT INTO conversations(patient_id, doctor_id) VALUES(?, 0)"
+                : "INSERT INTO conversations(patient_id) VALUES(?)";
         try (PreparedStatement ps = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, patientId);
             ps.executeUpdate();
@@ -125,6 +160,15 @@ public class SendMessageServlet extends HttpServlet {
         }
 
         throw new IllegalStateException("Unable to create conversation");
+    }
+
+    private boolean hasConversationDoctorIdColumn(Connection conn) throws Exception {
+        String sql = "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS " +
+                "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'conversations' AND COLUMN_NAME = 'doctor_id'";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next();
+        }
     }
 
     private int resolvePatientId(Connection conn, int senderId, int receiverId) throws Exception {
@@ -155,5 +199,25 @@ public class SendMessageServlet extends HttpServlet {
              ResultSet rs = ps.executeQuery()) {
             return rs.next();
         }
+    }
+
+    private String renderOwnMessage(String message) {
+        return "<div class=\"flex justify-end\">"
+                + "<div class=\"max-w-[70%] rounded-lg px-4 py-2 text-sm bg-[#0052FF] text-white\">"
+                + escapeHtml(message)
+                + "</div></div>";
+    }
+
+    private String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        return value
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 }
