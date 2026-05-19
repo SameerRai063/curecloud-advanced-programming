@@ -169,12 +169,12 @@
             return;
         }
 
-        // Use absolute URL built from server-provided context path to avoid wrong relative resolutions
-        fetch(BASE + '/chat?fragment=messages&senderId=' + encodeURIComponent(senderId) + '&receiverId=' + encodeURIComponent(receiverId) + '&_=' + Date.now(), {
+        fetch(BASE + '/getMessages?senderId=' + encodeURIComponent(senderId) + '&receiverId=' + encodeURIComponent(receiverId) + '&_=' + Date.now(), {
             cache: 'no-store'
         })
             .then(response => {
-                if (!response.ok) {
+                const contentType = response.headers.get('content-type') || '';
+                if (!response.ok || !contentType.includes('text/html')) {
                     console.error('Failed to load messages', response.status, response.url);
                     throw new Error('Unable to load messages');
                 }
@@ -197,7 +197,6 @@
             return;
         }
 
-        // POST to absolute sendMessage so it resolves correctly regardless of current path
         fetch(BASE + '/sendMessage', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -216,12 +215,12 @@
 
     // Periodically refresh contacts list (to update unread badges and ordering)
     function loadContactsList() {
-        // Use absolute URL built from server-provided context path
-        fetch(BASE + '/chat?fragment=contacts&receiverId=' + encodeURIComponent(receiverId) + '&_=' + Date.now(), {
+        fetch(BASE + '/getContacts?receiverId=' + encodeURIComponent(receiverId) + '&_=' + Date.now(), {
             cache: 'no-store'
         })
             .then(response => {
-                if (!response.ok) {
+                const contentType = response.headers.get('content-type') || '';
+                if (!response.ok || !contentType.includes('text/html')) {
                     console.error('Failed to load contacts', response.status, response.url);
                     throw new Error('Unable to load contacts');
                 }
