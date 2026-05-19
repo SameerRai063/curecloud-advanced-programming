@@ -1,36 +1,26 @@
 package Notification.Model;
 
 import User.Model.User;
-import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
+import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "notifications")
 public class Notification {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "user_id", nullable = false)
     private int userId;
 
-    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "message", columnDefinition = "TEXT")
     private String message;
 
-    @Column(name = "is_read", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean read;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
     private Timestamp createdAt;
 
-    // Relationship
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    // Relationship reference (managed manually by DAOs)
     private User user;
 
     // Constructors
@@ -69,6 +59,8 @@ public class Notification {
         if (createdAt == null) {
             return "";
         }
-        return createdAt.toLocalDateTime().format(DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a"));
+        // Convert through system default zone to avoid timezone-shifted display.
+        LocalDateTime localDateTime = createdAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return localDateTime.format(DateTimeFormatter.ofPattern("MMM d, yyyy h:mm:ss a"));
     }
 }

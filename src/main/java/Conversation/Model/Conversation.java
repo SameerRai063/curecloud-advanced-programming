@@ -1,31 +1,20 @@
 package Conversation.Model;
 
 import Patient.Model.Patient;
-import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "conversations")
 public class Conversation {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "patient_id", nullable = false)
     private int patientId;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
     private Timestamp createdAt;
 
-    // Relationships
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", insertable = false, updatable = false)
     private Patient patient;
 
-    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<message.Model.Message> messages = new ArrayList<>();
 
     // Constructors

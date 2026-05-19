@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page pageEncoding="UTF-8" %>
 <%@ page import="Notification.Model.Notification" %>
 <%@ page import="Notification.Model.dao.NotificationDAO" %>
 <%@ page import="java.util.List" %>
@@ -21,9 +21,13 @@
     List<Notification> notifications = java.util.Collections.emptyList();
     int unreadCount = 0;
     if (userId != null) {
-        NotificationDAO notificationDAO = new NotificationDAO();
-        notifications = notificationDAO.getNotificationsForUser(userId);
-        unreadCount = notificationDAO.countUnreadForUser(userId);
+        try {
+            NotificationDAO notificationDAO = new NotificationDAO();
+            notifications = notificationDAO.getNotificationsForUser(userId);
+            unreadCount = notificationDAO.countUnreadForUser(userId);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to load notifications", e);
+        }
     }
 
     java.util.function.Function<String, String> esc = value -> {
@@ -77,6 +81,14 @@
                 <h2 class="text-lg font-bold">Recent Notifications</h2>
                 <p class="text-sm text-slate-500"><%= unreadCount %> unread notification<%= unreadCount == 1 ? "" : "s" %></p>
             </div>
+            <form action="<%= request.getContextPath() %>/markAllNotificationsRead" method="post">
+                <button type="submit"
+                        class="inline-flex items-center gap-2 rounded-full bg-[#0052FF] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                        <%= notifications.isEmpty() ? "disabled" : "" %>>
+                    <span class="material-symbols-outlined text-[18px]">done_all</span>
+                    Mark all as read
+                </button>
+            </form>
         </div>
 
         <% if (notifications.isEmpty()) { %>

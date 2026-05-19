@@ -2,46 +2,29 @@ package Payment.Model;
 
 import Appointment.Model.Appointment;
 import Patient.Model.Patient;
-import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "payments")
 public class Payment {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "patient_id", nullable = false)
     private int patientId;
 
-    @Column(name = "appointment_id", nullable = false)
     private int appointmentId;
 
-    @Column(name = "amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "payment_status", columnDefinition = "VARCHAR(50) DEFAULT 'pending'")
     private String paymentStatus; // pending, completed, failed
 
-    @Column(name = "payment_method")
     private String paymentMethod;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at", insertable = false, updatable = false)
     private Timestamp updatedAt;
 
-    // Relationships
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", insertable = false, updatable = false)
+    // Relationships (managed manually by DAOs)
     private Patient patient;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "appointment_id", insertable = false, updatable = false)
     private Appointment appointment;
 
     // Constructors

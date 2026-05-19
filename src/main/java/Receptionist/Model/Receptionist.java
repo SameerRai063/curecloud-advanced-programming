@@ -1,29 +1,18 @@
 package Receptionist.Model;
 
-import jakarta.persistence.*;
 import User.Model.User;
 import java.sql.Timestamp;
 
-@Entity
-@Table(name = "receptionist")
 public class Receptionist {
 
-    @Id
-    @Column(name = "user_id")
     private int userId;
 
-    @Column(name = "status")
     private String status;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at", insertable = false, updatable = false)
     private Timestamp updatedAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "user_id")
     private User user;
 
     // Constructors

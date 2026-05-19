@@ -1,37 +1,23 @@
 package Feedback.Model;
 
 import Patient.Model.Patient;
-import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 
-@Entity
-@Table(name = "feedback")
 public class Feedback {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "patient_id", nullable = false)
     private int patientId;
 
-    @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
 
-    @Column(name = "rating", nullable = false)
     private int rating;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
     private Timestamp createdAt;
 
-    // Transient field for display
-    @Transient
     private String patientName;
 
-    // Relationship
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", insertable = false, updatable = false)
     private Patient patient;
 
     // Constructors

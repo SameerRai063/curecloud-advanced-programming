@@ -11,13 +11,6 @@
     int    totalPatients      = (request.getAttribute("totalPatients")      != null) ? (Integer) request.getAttribute("totalPatients")      : 0;
     int    totalReceptionists = (request.getAttribute("totalReceptionists") != null) ? (Integer) request.getAttribute("totalReceptionists") : 0;
     double totalRevenue       = (request.getAttribute("totalRevenue")       != null) ? (Double)  request.getAttribute("totalRevenue")       : 0.0;
-    List<String> activityLabels = (List<String>) request.getAttribute("activityLabels");
-    List<Integer> activityCounts = (List<Integer>) request.getAttribute("activityCounts");
-    List<Double> revenueCounts = (List<Double>) request.getAttribute("revenueCounts");
-    int activityMax = (request.getAttribute("activityMax") != null) ? (Integer) request.getAttribute("activityMax") : 1;
-    int activityTotal = (request.getAttribute("activityTotal") != null) ? (Integer) request.getAttribute("activityTotal") : 0;
-    double revenueMax = (request.getAttribute("revenueMax") != null) ? (Double) request.getAttribute("revenueMax") : 1.0;
-    double revenueTotal = (request.getAttribute("revenueTotal") != null) ? (Double) request.getAttribute("revenueTotal") : 0.0;
 
     String errorMessage = (String) request.getAttribute("errorMessage");
 %>
@@ -258,97 +251,7 @@
             </div>
         </div>
 
-        <div class="card">
-            <h3 class="card-title">Recent Activity</h3>
-            <div class="dashboard-charts">
-                <div>
-                    <div class="chart-panel-title">Activity</div>
-                    <div class="recent-activity-container">
-                    <% if (activityCounts == null || activityCounts.isEmpty() || activityTotal == 0) { %>
-                        <div class="activity-empty">No recent activity to display</div>
-                    <% } else { %>
-                    <div class="activity-chart">
-                        <% for (int i = 0; i < activityCounts.size(); i++) {
-                            int count = activityCounts.get(i);
-                            int height = Math.max(4, (int) Math.round((count * 100.0) / activityMax));
-                        %>
-                            <div class="activity-bar-item chart-clickable" data-chart-index="<%= i %>" onclick="selectDashboardDay(<%= i %>)" onkeydown="handleDashboardKey(event, <%= i %>)" role="button" tabindex="0">
-                                <div class="activity-count"><%= count %></div>
-                                <div class="activity-bar-track">
-                                    <div class="activity-bar" style="height: <%= height %>%;"></div>
-                                </div>
-                                <div class="activity-label"><%= activityLabels.get(i) %></div>
-                            </div>
-                        <% } %>
-                    </div>
-                    <% } %>
-                    </div>
-                </div>
-                <div>
-                    <div class="chart-panel-title">Revenue</div>
-                    <% if (revenueCounts == null || revenueCounts.isEmpty() || revenueTotal == 0) { %>
-                        <div class="activity-empty">No revenue to display</div>
-                    <% } else {
-                        StringBuilder points = new StringBuilder();
-                        StringBuilder area = new StringBuilder("0,150 ");
-                        for (int i = 0; i < revenueCounts.size(); i++) {
-                            double value = revenueCounts.get(i);
-                            double x = i * (300.0 / Math.max(revenueCounts.size() - 1, 1));
-                            double y = 150 - ((value / revenueMax) * 130);
-                            points.append(String.format(java.util.Locale.US, "%.1f,%.1f ", x, y));
-                            area.append(String.format(java.util.Locale.US, "%.1f,%.1f ", x, y));
-                        }
-                        area.append("300,150");
-                    %>
-                        <div class="revenue-total">Last 7 days: NPR <%= String.format("%,.2f", revenueTotal) %></div>
-                        <div class="revenue-chart">
-                            <svg class="revenue-svg" viewBox="0 0 300 166" preserveAspectRatio="none" aria-label="Revenue line chart">
-                                <line class="revenue-grid-line" x1="0" y1="20" x2="300" y2="20"></line>
-                                <line class="revenue-grid-line" x1="0" y1="85" x2="300" y2="85"></line>
-                                <line class="revenue-grid-line" x1="0" y1="150" x2="300" y2="150"></line>
-                                <polygon class="revenue-area" points="<%= area.toString() %>"></polygon>
-                                <polyline class="revenue-line" points="<%= points.toString() %>"></polyline>
-                                <% for (int i = 0; i < revenueCounts.size(); i++) {
-                                    double value = revenueCounts.get(i);
-                                    double x = i * (300.0 / Math.max(revenueCounts.size() - 1, 1));
-                                    double y = 150 - ((value / revenueMax) * 130);
-                                    double hitX = Math.max(0, x - 22);
-                                    double hitWidth = (i == 0 || i == revenueCounts.size() - 1) ? 44 : 50;
-                                %>
-                                    <rect class="revenue-hit-zone" data-chart-index="<%= i %>" onclick="selectDashboardDay(<%= i %>)" x="<%= String.format(java.util.Locale.US, "%.1f", hitX) %>" y="0" width="<%= String.format(java.util.Locale.US, "%.1f", hitWidth) %>" height="166"></rect>
-                                    <circle class="revenue-point chart-clickable" data-chart-index="<%= i %>" onclick="selectDashboardDay(<%= i %>)" cx="<%= String.format(java.util.Locale.US, "%.1f", x) %>" cy="<%= String.format(java.util.Locale.US, "%.1f", y) %>" r="3.5"></circle>
-                                <% } %>
-                            </svg>
-                            <div class="revenue-labels">
-                                <% for (String label : activityLabels) { %>
-                                    <span><%= label %></span>
-                                <% } %>
-                            </div>
-                        </div>
-                    <% } %>
-                </div>
-            </div>
-            <% if (activityLabels != null && !activityLabels.isEmpty()) {
-                int selectedIndex = activityLabels.size() - 1;
-                int selectedActivity = (activityCounts != null && activityCounts.size() > selectedIndex) ? activityCounts.get(selectedIndex) : 0;
-                double selectedRevenue = (revenueCounts != null && revenueCounts.size() > selectedIndex) ? revenueCounts.get(selectedIndex) : 0.0;
-            %>
-                <div class="chart-details">
-                    <div class="chart-detail-item">
-                        <span>Date</span>
-                        <strong id="chartDetailDate"><%= activityLabels.get(selectedIndex) %></strong>
-                    </div>
-                    <div class="chart-detail-item">
-                        <span>Activity</span>
-                        <strong id="chartDetailActivity"><%= selectedActivity %></strong>
-                    </div>
-                    <div class="chart-detail-item">
-                        <span>Revenue</span>
-                        <strong id="chartDetailRevenue">NPR <%= String.format("%,.2f", selectedRevenue) %></strong>
-                    </div>
-                </div>
-            <% } %>
-        </div>
+
     </main>
 </div>
 <div id="doctorModal" class="modal-overlay">
@@ -513,59 +416,7 @@
 
 
 <script>
-    const dashboardChartData = {
-        labels: [
-            <% if (activityLabels != null) { for (int i = 0; i < activityLabels.size(); i++) { %>
-                "<%= activityLabels.get(i) %>"<%= (i < activityLabels.size() - 1) ? "," : "" %>
-            <% } } %>
-        ],
-        activity: [
-            <% if (activityCounts != null) { for (int i = 0; i < activityCounts.size(); i++) { %>
-                <%= activityCounts.get(i) %><%= (i < activityCounts.size() - 1) ? "," : "" %>
-            <% } } %>
-        ],
-        revenue: [
-            <% if (revenueCounts != null) { for (int i = 0; i < revenueCounts.size(); i++) { %>
-                <%= String.format(java.util.Locale.US, "%.2f", revenueCounts.get(i)) %><%= (i < revenueCounts.size() - 1) ? "," : "" %>
-            <% } } %>
-        ]
-    };
 
-    function formatNpr(value) {
-        return 'NPR ' + Number(value || 0).toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-    }
-
-    function selectDashboardDay(index) {
-        if (!dashboardChartData.labels[index]) return;
-
-        document.querySelectorAll('[data-chart-index]').forEach(function(el) {
-            el.classList.toggle('selected', Number(el.dataset.chartIndex) === index);
-        });
-
-        const dateEl = document.getElementById('chartDetailDate');
-        const activityEl = document.getElementById('chartDetailActivity');
-        const revenueEl = document.getElementById('chartDetailRevenue');
-
-        if (dateEl) dateEl.textContent = dashboardChartData.labels[index];
-        if (activityEl) activityEl.textContent = dashboardChartData.activity[index] || 0;
-        if (revenueEl) revenueEl.textContent = formatNpr(dashboardChartData.revenue[index] || 0);
-    }
-
-    function handleDashboardKey(event, index) {
-        if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            selectDashboardDay(index);
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        if (dashboardChartData.labels.length > 0) {
-            selectDashboardDay(dashboardChartData.labels.length - 1);
-        }
-    });
 
     // Open a specific modal
     function openModal(modalId) {

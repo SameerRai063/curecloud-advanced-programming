@@ -2,60 +2,38 @@ package Appointment.Model;
 
 import Doctor.Model.Doctor;
 import Patient.Model.Patient;
-import jakarta.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
-@Entity
-@Table(name = "appointments")
 public class Appointment {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "patient_id", nullable = false)
     private int patientId;
 
-    @Column(name = "doctor_id", nullable = false)
     private int doctorId;
 
-    @Column(name = "appointment_date", nullable = false)
     private Date appointmentDate;
 
-    @Column(name = "appointment_time")
     private java.sql.Time appointmentTime;
 
-    @Column(name = "reason")
     private String reason;
 
-    @Column(name = "status", nullable = false)
     private String status; // scheduled, completed, cancelled
 
-    @Column(name = "created_at", insertable = false, updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at", insertable = false, updatable = false)
     private Timestamp updatedAt;
 
-    // Transient fields for display purposes (not persisted)
-    @Transient
     private String patientName;
 
-    @Transient
     private String doctorName;
 
-    @Transient
     private String department;
 
-    // Relationships (Lazy loaded for performance)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", insertable = false, updatable = false)
     private Patient patient;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "doctor_id", insertable = false, updatable = false)
     private Doctor doctor;
 
     // Constructor

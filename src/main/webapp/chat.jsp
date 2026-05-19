@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -108,27 +108,18 @@
             <div class="grid min-h-[680px] grid-cols-[280px_1fr] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
                 <section class="border-r border-slate-200 bg-slate-50">
                     <div class="border-b border-slate-200 p-4">
-                        <p class="text-xs font-bold uppercase tracking-wide text-slate-500">${contactRole}s</p>
+                        <p class="text-xs font-bold uppercase tracking-wide text-slate-500">
+                            <c:choose>
+                                <c:when test="${sessionScope.userRole eq 'patient'}">Receptionists</c:when>
+                                <c:otherwise>Patients</c:otherwise>
+                            </c:choose>
+                        </p>
+                        <p class="mt-1 text-[11px] text-slate-400">Unread and recent chats</p>
                     </div>
-                    <div class="p-3">
-                        <c:choose>
-                            <c:when test="${empty contacts}">
-                                <div class="rounded-lg border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-500">
-                                    No ${contactRole} accounts found.
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <c:forEach var="contact" items="${contacts}">
-                                    <a class="mb-2 flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium ${contact.id == receiverId ? 'bg-[#0052FF] text-white' : 'text-slate-700 hover:bg-white'}"
-                                       href="${pageContext.request.contextPath}/chat?receiverId=${contact.id}">
-                                        <span class="flex size-9 items-center justify-center rounded-full ${contact.id == receiverId ? 'bg-white/20' : 'bg-slate-200'}">
-                                            ${contact.name.substring(0,1)}
-                                        </span>
-                                        <span>${contact.name}</span>
-                                    </a>
-                                </c:forEach>
-                            </c:otherwise>
-                        </c:choose>
+                    <div id="contactsList" class="p-3">
+                        <div class="rounded-lg border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-500">
+                            Loading contacts...
+                        </div>
                     </div>
                 </section>
 
@@ -176,11 +167,14 @@
             return;
         }
 
-        fetch('${pageContext.request.contextPath}/getMessages?senderId=' + encodeURIComponent(senderId) + '&receiverId=' + encodeURIComponent(receiverId))
+        fetch('${pageContext.request.contextPath}/getMessages?senderId=' + encodeURIComponent(senderId) + '&receiverId=' + encodeURIComponent(receiverId) + '&_=' + Date.now(), {
+            cache: 'no-store'
+        })
             .then(response => response.text())
             .then(data => {
                 chatBox.innerHTML = data || '<div class="text-sm text-slate-500">No messages yet.</div>';
                 chatBox.scrollTop = chatBox.scrollHeight;
+                loadContactsList();
             });
     }
 
@@ -199,12 +193,33 @@
                 + '&message=' + encodeURIComponent(message)
         }).then(() => {
             messageInput.value = '';
+            loadContactsList();
             loadMessages();
         });
     });
 
     loadMessages();
-    setInterval(loadMessages, 2000);
+    setInterval(loadMessages, 1500);
+
+    // Periodically refresh contacts list (to update unread badges and ordering)
+    function loadContactsList() {
+        fetch('${pageContext.request.contextPath}/getContacts?receiverId=' + encodeURIComponent(receiverId) + '&_=' + Date.now(), {
+            cache: 'no-store'
+        })
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('contactsList').innerHTML = html;
+            })
+            .catch(() => {
+                document.getElementById('contactsList').innerHTML =
+                    '<div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">Unable to refresh contacts.</div>';
+            });
+    }
+
+    loadContactsList();
+    setInterval(loadContactsList, 1500);
+
+    // Polling already keeps chat and unread badges fresh without requiring WebSocket support.
 </script>
 </body>
 </html>

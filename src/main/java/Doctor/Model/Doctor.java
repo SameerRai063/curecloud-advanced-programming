@@ -1,11 +1,9 @@
 package Doctor.Model;
 
-import jakarta.persistence.*;
+// ...existing code...
 import User.Model.User;
 import java.sql.Timestamp;
 
-@Entity
-@Table(name = "doctor")
 public class Doctor {
 
     // Department Constants
@@ -15,31 +13,20 @@ public class Doctor {
     public static final String ORTHOPEDICS = "Orthopedics";
     public static final String GENERAL_MEDICINE = "General Medicine";
 
-    @Id
-    @Column(name = "user_id")
     private int userId;
 
-    @Column(name = "status")
     private String status;
 
-    @Column(name = "qualifications")
     private String qualifications;
 
-    @Column(name = "department")
     private String department;
 
-    @Column(name = "experience_years")
     private int experienceYears;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at", insertable = false, updatable = false)
     private Timestamp updatedAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "user_id")
     private User user;
 
     // Constructors

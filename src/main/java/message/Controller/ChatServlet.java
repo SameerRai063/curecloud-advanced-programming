@@ -55,7 +55,9 @@ public class ChatServlet extends HttpServlet {
             ps.setString(1, role);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    contacts.add(new Contact(rs.getInt("id"), rs.getString("name")));
+                    int contactId = rs.getInt("id");
+                    String contactName = rs.getString("name");
+                    contacts.add(new Contact(contactId, contactName));
                 }
             }
         }
@@ -98,12 +100,7 @@ public class ChatServlet extends HttpServlet {
             this.name = name;
         }
 
-        public int getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
+        public int getId() { return id; }
+        public String getName() { return name; }
     }
 }

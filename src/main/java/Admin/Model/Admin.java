@@ -1,30 +1,18 @@
 package Admin.Model;
 
-import jakarta.persistence.*;
 import User.Model.User;
-
 import java.sql.Timestamp;
 
-@Entity
-@Table(name = "admin")
 public class Admin {
 
-    @Id
-    @Column(name = "user_id")
     private int userId;
 
-    @Column(name = "last_login")
     private Timestamp lastLogin;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at", insertable = false, updatable = false)
     private Timestamp updatedAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "user_id")
     private User user;
 
     // Constructors

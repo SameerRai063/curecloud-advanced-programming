@@ -62,15 +62,27 @@ public class SendMessageServlet extends HttpServlet {
         try (Connection conn = DBConnection.getConnection()) {
             int conversationId = findOrCreateConversation(conn, senderId, receiverId);
 
-            String sql = "INSERT INTO messages(conversation_id, sender_id, message_text) VALUES(?,?,?)";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, conversationId);
-                ps.setInt(2, senderId);
-                ps.setString(3, message);
-
-                ps.executeUpdate();
+            if (hasReceiverIdColumn(conn)) {
+                String sql = "INSERT INTO messages(conversation_id, sender_id, receiver_id, message_text) VALUES(?,?,?,?)";
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setInt(1, conversationId);
+                    ps.setInt(2, senderId);
+                    ps.setInt(3, receiverId);
+                    ps.setString(4, message);
+                    ps.executeUpdate();
+                }
+            } else {
+                // Backward-compatibility for DBs that have not yet applied receiver_id migration.
+                String sql = "INSERT INTO messages(conversation_id, sender_id, message_text) VALUES(?,?,?)";
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setInt(1, conversationId);
+                    ps.setInt(2, senderId);
+                    ps.setString(3, message);
+                    ps.executeUpdate();
+                }
             }
 
+            // notify via notification table
             try {
                 new NotificationDAO().addNotification(receiverId, "New Chat Message", "You received a new chat message.");
             } catch (Exception e) {
@@ -133,6 +145,15 @@ public class SendMessageServlet extends HttpServlet {
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
+        }
+    }
+
+    private boolean hasReceiverIdColumn(Connection conn) throws Exception {
+        String sql = "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS " +
+                "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'messages' AND COLUMN_NAME = 'receiver_id'";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next();
         }
     }
 }

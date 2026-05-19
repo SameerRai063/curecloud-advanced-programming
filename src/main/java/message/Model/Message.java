@@ -2,39 +2,24 @@ package message.Model;
 
 import Conversation.Model.Conversation;
 import User.Model.User;
-import jakarta.persistence.*;
 import java.sql.Timestamp;
 
-@Entity
-@Table(name = "messages")
 public class Message {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "conversation_id", nullable = false)
     private int conversationId;
 
-    @Column(name = "sender_id", nullable = false)
     private int senderId;
 
-    @Column(name = "message_text", nullable = false, columnDefinition = "TEXT")
     private String messageText;
 
-    @Column(name = "sent_at", insertable = false, updatable = false)
     private Timestamp sentAt;
 
-    @Column(name = "is_read", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean isRead;
 
-    // Relationships
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "conversation_id", insertable = false, updatable = false)
+    // Relationships (kept as plain references, managed manually by DAOs)
     private Conversation conversation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id", insertable = false, updatable = false)
     private User sender;
 
     // Constructors

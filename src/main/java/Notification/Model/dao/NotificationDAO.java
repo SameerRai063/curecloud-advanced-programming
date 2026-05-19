@@ -73,4 +73,14 @@ public class NotificationDAO {
             }
         }
     }
+
+    public int markAllReadForUser(int userId) throws Exception {
+        String sql = "UPDATE notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate();
+        }
+    }
 }

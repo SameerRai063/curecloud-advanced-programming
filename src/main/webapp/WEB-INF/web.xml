@@ -65,12 +65,30 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>getContacts</servlet-name>
+        <servlet-class>message.Controller.GetContactsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>getContacts</servlet-name>
+        <url-pattern>/getContacts</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>chat</servlet-name>
         <servlet-class>message.Controller.ChatServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>chat</servlet-name>
         <url-pattern>/chat</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>dbStatus</servlet-name>
+        <servlet-class>utils.DBStatusServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dbStatus</servlet-name>
+        <url-pattern>/dbStatus</url-pattern>
     </servlet-mapping>
 
     <servlet>
@@ -498,6 +516,15 @@
     <servlet-mapping>
         <servlet-name>billing</servlet-name>
         <url-pattern>/billing</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>markAllNotificationsRead</servlet-name>
+        <servlet-class>Notification.Controller.MarkAllNotificationsReadServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>markAllNotificationsRead</servlet-name>
+        <url-pattern>/markAllNotificationsRead</url-pattern>
     </servlet-mapping>
 
 </web-app>

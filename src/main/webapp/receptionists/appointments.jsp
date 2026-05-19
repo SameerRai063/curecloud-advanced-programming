@@ -256,7 +256,6 @@
       </table>
     </div>
 
-    <button class="fab" onclick="window.location.href='addAppointment.jsp'"><i class="fa-solid fa-plus"></i></button>
   </main>
 </div>
 <!-- VIEW APPOINTMENT MODAL -->

@@ -1,32 +1,20 @@
 package Patient.Model;
 
-import jakarta.persistence.*;
 import User.Model.User;
 import java.sql.Timestamp;
 
-@Entity
-@Table(name = "patient")
 public class Patient {
 
-    @Id
-    @Column(name = "user_id")
     private int userId;
 
-    @Column(name = "blood_group")
     private String bloodGroup;
 
-    @Column(name = "is_active")
     private boolean isActive; // UPDATED
 
-    @Column(name = "created_at", insertable = false, updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at", insertable = false, updatable = false)
     private Timestamp updatedAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "user_id")
     private User user;
 
     // Constructors

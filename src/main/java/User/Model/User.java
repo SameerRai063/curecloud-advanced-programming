@@ -1,48 +1,32 @@
 package User.Model;
 
-import jakarta.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-@Entity
-@Table(name = "users")
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "gender")
     private String gender;
 
-    @Column(name = "dob")
     private Date dob;
 
-    @Column(name = "address")
     private String address;
 
-    @Column(name = "phone")
     private String phone;
 
-    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "profile_image")
     private String profileImage;
 
-    @Column(name = "role", nullable = false)
     private String role;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at", insertable = false, updatable = false)
     private Timestamp updatedAt;
     // Constructor (Empty)
     public User() {}
