@@ -8,10 +8,10 @@ public class DBConnection {
     // Defaults are set to sane local-development values (adjust as needed).
     private static final String DB_URL = System.getenv().getOrDefault(
             "CURECLOUD_DB_URL",
-            "jdbc:mysql://127.0.0.1:3306/curecloud?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true"
+            "jdbc:mysql://127.0.0.1:3306/suraj?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true"
     );
     private static final String DB_USER = System.getenv().getOrDefault("CURECLOUD_DB_USER", "root");
-    private static final String DB_PASSWORD = System.getenv().getOrDefault("CURECLOUD_DB_PASSWORD", "1234");
+    private static final String DB_PASSWORD = System.getenv().getOrDefault("CURECLOUD_DB_PASSWORD", "samirrai12345@");
 
 
     public static Connection getConnection() throws  Exception {

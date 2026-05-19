@@ -215,7 +215,7 @@
                                 <td><p class="review-text">${review.comment}</p></td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="btn-view"><i class="fa-solid fa-reply"></i> Reply</button>
+
                                         <a href="<%= request.getContextPath() %>/deleteReview?id=${review.id}" class="btn-delete" onclick="return confirm('Delete this review?');"><i class="fa-solid fa-trash"></i></a>
                                     </div>
                                 </td>
