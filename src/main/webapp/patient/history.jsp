@@ -658,7 +658,7 @@
             return;
         }
 
-        // Build and submit a real form POST to your servlet
+        // Build and submit a real form POST to  servlet
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '${pageContext.request.contextPath}/submitFeedback';
