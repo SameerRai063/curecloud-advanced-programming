@@ -16,6 +16,9 @@
         body { font-family: 'Inter', sans-serif; }
         #bookingModal { transition: opacity 0.2s ease; }
         #bookingModal.hidden { display: none; }
+        .star-filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+        }
     </style>
     <script id="tailwind-config">
         tailwind.config = {
@@ -644,33 +647,61 @@
     }
 
     function submitReview() {
-        alert('Review submitted successfully!');
-        closeReviewModal();
+        if (currentRating === 0) {
+            alert('Please select a star rating.');
+            return;
+        }
+
+        const comment = document.getElementById('reviewText').value.trim();
+        if (!comment) {
+            alert('Please write a review before submitting.');
+            return;
+        }
+
+        // Build and submit a real form POST to your servlet
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '${pageContext.request.contextPath}/submitFeedback';
+
+        const ratingInput = document.createElement('input');
+        ratingInput.type  = 'hidden';
+        ratingInput.name  = 'rating';
+        ratingInput.value = currentRating;
+
+        const commentInput = document.createElement('input');
+        commentInput.type  = 'hidden';
+        commentInput.name  = 'comment';
+        commentInput.value = comment;
+
+        form.appendChild(ratingInput);
+        form.appendChild(commentInput);
+        document.body.appendChild(form);
+        form.submit();
     }
-
-    document.querySelectorAll('#starRating .star').forEach(star => {
-        star.addEventListener('click', () => {
-            currentRating = parseInt(star.dataset.val);
-            updateStars(currentRating);
-        });
-        star.addEventListener('mouseenter', () => updateStars(parseInt(star.dataset.val)));
-        star.addEventListener('mouseleave', () => updateStars(currentRating));
-    });
-
     function updateStars(rating) {
-        document.querySelectorAll('#starRating .star').forEach(s => {
+        document.querySelectorAll('#starRating .star').forEach(function(s) {
             const val = parseInt(s.dataset.val);
             if (val <= rating) {
-                s.style.fontVariationSettings = "'FILL' 1";
+                s.classList.add('star-filled', 'text-yellow-400');
                 s.classList.remove('text-slate-300');
-                s.classList.add('text-yellow-400');
             } else {
-                s.style.fontVariationSettings = "'FILL' 0";
-                s.classList.remove('text-yellow-400');
+                s.classList.remove('star-filled', 'text-yellow-400');
                 s.classList.add('text-slate-300');
             }
         });
     }
+    document.querySelectorAll('#starRating .star').forEach(function(star) {
+        star.addEventListener('click', function() {
+            currentRating = parseInt(this.dataset.val);
+            updateStars(currentRating);
+        });
+        star.addEventListener('mouseenter', function() {
+            updateStars(parseInt(this.dataset.val));
+        });
+        star.addEventListener('mouseleave', function() {
+            updateStars(currentRating);
+        });
+    });
 </script>
 </body>
 </html>

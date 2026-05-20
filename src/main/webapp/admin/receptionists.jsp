@@ -250,7 +250,7 @@
                 <td>${receptionist.user.createdAt}</td>
                 <td>
                   <c:choose>
-                    <c:when test="${receptionist.status == 'active'}">
+                    <c:when test="${receptionist.status == 'Active'}">
                       <span class="badge" style="background-color: #d1fae5; color: #065f46;">Active</span>
                     </c:when>
                     <c:otherwise>

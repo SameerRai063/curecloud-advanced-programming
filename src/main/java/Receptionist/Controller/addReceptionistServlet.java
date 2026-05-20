@@ -68,7 +68,7 @@ public class addReceptionistServlet extends HttpServlet {
             // 3. Map Receptionist Details
             Receptionist receptionist = new Receptionist();
             receptionist.setUser(user);
-            receptionist.setStatus(request.getParameter("status"));
+            //receptionist.setStatus(request.getParameter("status"));
 
             // 4. Database transaction via Hibernate
             UserService userService = new UserService();
