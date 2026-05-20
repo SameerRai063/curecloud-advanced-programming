@@ -83,6 +83,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>chatUnreadCount</servlet-name>
+        <servlet-class>message.Controller.ChatUnreadCountServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>chatUnreadCount</servlet-name>
+        <url-pattern>/chatUnreadCount</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>dbStatus</servlet-name>
         <servlet-class>utils.DBStatusServlet</servlet-class>
     </servlet>

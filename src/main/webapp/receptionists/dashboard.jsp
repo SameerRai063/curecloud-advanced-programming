@@ -175,7 +175,7 @@
             <li class="nav-item"><a href="<%= request.getContextPath() %>/receptionists/doctors" class="nav-link"><i class="fa-solid fa-stethoscope"></i> Doctors</a></li>
             <li class="nav-item"><a href="<%= request.getContextPath() %>/receptionists/patients" class="nav-link"><i class="fa-solid fa-users"></i> Patients</a></li>
             <li class="nav-item"><a href="<%= request.getContextPath() %>/receptionists/appointments" class="nav-link"><i class="fa-regular fa-calendar"></i> Appointments</a></li>
-            <li class="nav-item"><a href="<%= request.getContextPath() %>/chat" class="nav-link"><i class="fa-regular fa-comments"></i> Chat</a></li>
+            <li class="nav-item"><a href="<%= request.getContextPath() %>/chat" class="nav-link"><i class="fa-regular fa-comments"></i> Chat <span class="chat-unread-badge" style="display:none;margin-left:auto;min-width:20px;border-radius:999px;background:#ef4444;color:white;font-size:11px;font-weight:700;line-height:1;padding:5px 7px;text-align:center;"></span></a></li>
 
         </ul>
     </div>
@@ -436,5 +436,20 @@
     }
 </script>
 
+<script>
+    (function loadChatUnreadCount() {
+        const badge = document.querySelector('.chat-unread-badge');
+        if (!badge) return;
+        fetch('<%= request.getContextPath() %>/chatUnreadCount?_=' + Date.now(), {cache: 'no-store'})
+            .then(response => response.ok ? response.text() : '0')
+            .then(text => {
+                const count = Number.parseInt(text, 10) || 0;
+                badge.textContent = count > 99 ? '99+' : String(count);
+                badge.style.display = count > 0 ? 'inline-flex' : 'none';
+            })
+            .catch(() => { badge.style.display = 'none'; });
+        setTimeout(loadChatUnreadCount, 5000);
+    })();
+</script>
 </body>
 </html>
